@@ -1,0 +1,23 @@
+﻿<Window x:Class="Mastersign.AutoForm.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:local="clr-namespace:Mastersign.AutoForm"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Button HorizontalAlignment="Right" Margin="6" Padding="6,4" Name="btnRun">RUN</Button>
+        <Border Grid.Row="1" Margin="0,12,0,0" BorderThickness="0,2,0,0">
+            <Border.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+            </Border.BorderBrush>
+            <avalonEdit:TextEditor Name="textEditor" FontSize="11pt" FontFamily="Consolas" ShowLineNumbers="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+        </Border>
+    </Grid>
+</Window>
