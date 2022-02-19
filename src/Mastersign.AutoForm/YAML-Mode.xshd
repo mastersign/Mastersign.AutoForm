@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0"?>
+<!-- Imperfect syntax grammar for YAML by Tobias Kiertscher <dev@mastersign.de> -->
 <SyntaxDefinition xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008"
                   name="YAML" extensions=".yaml,.yml">
 
   <Color name="Comment" foreground="LightSlateGray" fontStyle="italic" />
-  <Color name="String" foreground="OliveDrab" fontWeight="normal" />
+  <Color name="String" foreground="DarkGreen" fontWeight="normal" />
   <Color name="Array" foreground="DarkMagenta" fontWeight="bold" />
-  <Color name="Parenthesis" foreground="DarkMagenta" />
   <Color name="MultilineStringIndicator" foreground="DarkMagenta" fontWeight="bold" />
-  <Color name="MapKey" foreground="Peru" />
-  <Color name="Keyword" foreground="RoyalBlue" />
-  <Color name="Number" foreground="DarkCyan" />
-  <Color name="Value" foreground="DarkGreen" />
-  <Color name="Punctuation" foreground="DarkGray" />
+  <Color name="MapKey" foreground="Firebrick" />
+  <Color name="Keyword" foreground="DarkCyan" />
+  <Color name="Number" foreground="RoyalBlue" />
+  <Color name="Json" foreground="SlateBlue" />
+  <Color name="Punctuation" foreground="MediumSlateBlue" />
 
   <RuleSet>
     <Span color="Comment" begin="#" />
@@ -24,21 +24,48 @@
       </RuleSet>
     </Span>
 
+    <Import ruleSet="Literals" />
+    <Span ruleSet="JsonExpression">
+      <Begin>(?&lt;=\:)\s(?=\[|\{)</Begin>
+    </Span>
+
     <Rule color="Array">^\s*-</Rule>
     <Rule color="MapKey">\s*(?:&apos;.+?&apos;|&quot;.+?&quot;|\S+?)\s*(?=\:)</Rule>
 
-    <Import ruleSet="JsonExpression" />
+  </RuleSet>
+
+  <RuleSet name="Literals">
+    <Import ruleSet="Strings" />
+    <Rule color="Keyword">(?&lt;=\:|-)\s+(true|false|yes|no|on|off|null|NaN)\s*$</Rule>
+    <Rule color="Number">(?&lt;=\:|-)\s*(\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?)\s*$</Rule>
   </RuleSet>
 
   <RuleSet name="Strings">
     <Span color="String">
-      <Begin>&quot;</Begin>
+      <Begin>(?&lt;=\:|-)\s*&quot;</Begin>
       <End>&quot;</End>
       <RuleSet>
         <Span begin="\\" end="." foreground="IndianRed" />
       </RuleSet>
     </Span>
     <Span color="String">
+      <Begin>(?&lt;=\:|-)\s*&apos;</Begin>
+      <End>&apos;</End>
+      <RuleSet>
+        <Span begin="\\" end="." foreground="IndianRed" />
+      </RuleSet>
+    </Span>
+  </RuleSet>
+
+  <RuleSet name="JsonStrings">
+    <Span color="Json">
+      <Begin>&quot;</Begin>
+      <End>&quot;</End>
+      <RuleSet>
+        <Span begin="\\" end="." foreground="IndianRed" />
+      </RuleSet>
+    </Span>
+    <Span color="Json">
       <Begin>&apos;</Begin>
       <End>&apos;</End>
       <RuleSet>
@@ -47,43 +74,27 @@
     </Span>
   </RuleSet>
 
-  <RuleSet name="Literals">
-    <Rule color="Keyword">(?&lt;=\:)\s*(true|false|yes|no|on|off|null|NaN)$</Rule>
-    <Rule color="Number">(?&lt;=\:)\s*\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?\s*$</Rule>
-    <Rule color="Value">(?&lt;=\:)\s*.+$</Rule>
-  </RuleSet>
-
-  // https://github.com/icsharpcode/AvalonEdit/blob/master/ICSharpCode.AvalonEdit/Highlighting/Resources/Json.xshd
-
   <RuleSet name="JsonObject">
-    <Import ruleSet="Strings" />
-    <Span color="Punctuation" ruleSet="JsonExpression">
-      <Begin>:</Begin>
-    </Span>
-    <Span color="Punctuation">
-      <Begin>,</Begin>
-    </Span>
-    <Rule color="MapKey">\s*(?:&apos;.+?&apos;|&quot;.+?&quot;|\S+?)\s*(?=\:)</Rule>
+    <Import ruleSet="JsonExpression" />
+    <Rule color="Punctuation">,</Rule>
   </RuleSet>
 
   <RuleSet name="JsonArray">
     <Import ruleSet="JsonExpression"/>
-    <Span color="Punctuation">
-      <Begin>,</Begin>
-    </Span>
+    <Rule color="Punctuation">,</Rule>
   </RuleSet>
 
   <RuleSet name="JsonExpression">
-    <Span color="Parenthesis" ruleSet="JsonObject" multiline="true">
+    <Span color="Comment" begin="#" />
+    <Span color="Json" ruleSet="JsonObject" multiline="true">
       <Begin>\{</Begin>
       <End>\}</End>
     </Span>
-    <Span color="Parenthesis" ruleSet="JsonArray" multiline="true">
+    <Span color="Json" ruleSet="JsonArray" multiline="true">
       <Begin>\[</Begin>
       <End>\]</End>
     </Span>
-    <!--<Import ruleSet="Strings" />-->
-    <Import ruleSet="Literals" />
+    <Import ruleSet="JsonStrings" />
   </RuleSet>
 
 </SyntaxDefinition>
