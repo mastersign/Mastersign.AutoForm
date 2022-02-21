@@ -13,8 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using ICSharpCode.AvalonEdit.Highlighting;
+using Microsoft.Win32;
+using System.IO;
 
 namespace Mastersign.AutoForm
 {
@@ -23,66 +23,96 @@ namespace Mastersign.AutoForm
     /// </summary>
     public partial class MainWindow : Window
     {
-        private void InitializeHighlighting()
-        {
-            var t = typeof(MainWindow);
-            var a = t.Assembly;
-            using (var s = a.GetManifestResourceStream(t.Namespace + ".YAML-Mode.xshd"))
-            {
-                using (var r = new XmlTextReader(s))
-                {
-                    textEditor.SyntaxHighlighting = HighlightingLoader.Load(r, HighlightingManager.Instance);
-                }
-            }
-        }
+        private AutomationProject Project { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeHighlighting();
-            textEditor.Text = EXAMPLE;
         }
 
-        private const string EXAMPLE = @"# This is a YAML document
-title: Dark Theme Demo
-theme: 'dark'
-grid:
-  # comments
-  columns: 4
-  rows:5
-'defaultSlot': main # comments
-array:
-- 'abc'
-- ABC
-- true
-- 123
-- 127.0.0.1
-slots:
-  main: { columnSpan: 4, rowSpan: '3','history': ""20}"", ""extensions"":50 } # CMT
-  A:
-    visible: yes
-    row: 3
-    ""column Span"":'wide'
-    'rowSpan': null
-    colorFilter: saturate(30%) contrast(400%) brightness(50%)
-  B: {
-    row: 3,
-    column: 'auto',
-    columnSpan: 2, # CMT
-    rowSpan: 2,
-    extensions: [ ""a{"", 'b', {x: 123}, ]
-    extensions2: [""a,"",'b',{'x':123},]
-  }
-docstring: |
-  ABC
-  DEF
+        private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            var saveFileDlg = new SaveFileDialog
+            {
+                Title = "Save AutoForm Template...",
+                AddExtension = true,
+                Filter = "Excel Worksheets (*.xlsx)|*.xlsx",
+                OverwritePrompt = true,
+            };
+            if (saveFileDlg.ShowDialog() == true)
+            {
+                var t = typeof(MainWindow);
+                var a = t.Assembly;
+                using (var src = a.GetManifestResourceStream(t.Namespace + ".Template.xlsx"))
+                using (var dst = File.OpenWrite(saveFileDlg.FileName))
+                {
+                    src.CopyTo(dst);
+                }
+            }
+        }
 
-'something else': >+3
-   This
-   https://boomack.com
-   is more text.
+        private void LoadAutomationProject(string filename)
+        {
+            txtExcelFile.Text = filename;
+            var factory = new AutomationProjectFactory();
+            Project = factory.ParseExcelFile(filename);
+            txtLog.Text = Project.ToString();
+            txtLog.Foreground = Project.HasErrors ? Brushes.Maroon : SystemColors.ControlTextBrush;
+            btnRun.IsEnabled = !Project.HasErrors;
+            btnReload.IsEnabled = true;
+        }
 
-# THE END
-";
+        private void btnChooseExcelFile_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDlg = new OpenFileDialog
+            {
+                Title = "Open AutoForm Script...",
+                Filter = "Excel Worksheets (*.xlsx)|*.xlsx",
+                Multiselect = false,
+            };
+            if (openFileDlg.ShowDialog() == true)
+            {
+                LoadAutomationProject(openFileDlg.FileName);
+            }
+        }
+
+        private void btnReload_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtExcelFile.Text)) return;
+            LoadAutomationProject(txtExcelFile.Text);
+        }
+
+        private async void btnRun_Click(object sender, RoutedEventArgs e)
+        {
+            if (Project == null || Project.HasErrors || Project.Actions.Count == 0) return;
+
+            var runner = new ScriptRunner();
+            try
+            {
+                await runner.Initialize();
+                foreach (var action in Project.Actions)
+                {
+                    if (action is PauseAction pauseAction)
+                    {
+                        var result = MessageBox.Show(this, pauseAction.Label, "AutoForm Pause",
+                            MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                        if (result == MessageBoxResult.Cancel) break;
+                    }
+                    else
+                    {
+                        await runner.Run(action);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, "Error during execution.\n\n" + ex.Message, "AutoForm Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                runner.Dispose();
+            }
+        }
     }
 }

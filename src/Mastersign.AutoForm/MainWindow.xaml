@@ -3,21 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:local="clr-namespace:Mastersign.AutoForm"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="570" Width="740" Icon="/Icon.ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="0,0,0,4" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="Margin" Value="0,0,0,8" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <Button HorizontalAlignment="Right" Margin="6" Padding="6,4" Name="btnRun">RUN</Button>
-        <Border Grid.Row="1" Margin="0,12,0,0" BorderThickness="0,2,0,0">
-            <Border.BorderBrush>
-                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
-            </Border.BorderBrush>
-            <avalonEdit:TextEditor Name="textEditor" FontSize="11pt" FontFamily="Consolas" ShowLineNumbers="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+
+        <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+            <TextBlock FontSize="24" Margin="0,0,0,10">AutoForm</TextBlock>
+            <TextBlock>
+                Download a template file and define your automation script.
+            </TextBlock>
+            <Button Name="btnDownloadTemplate" HorizontalAlignment="Right" Click="btnDownloadTemplate_Click">Download Template</Button>
+            <TextBlock>
+                Select an Excel file with the automation script and press RUN.
+            </TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Padding="0,4,4,0"  Margin="0,0,0,4">Excel File:</Label>
+                <TextBox Name="txtExcelFile" Grid.Column="1" VerticalAlignment="Top" Margin="0,4,6,0" IsEnabled="False"></TextBox>
+                <Button Name="btnChooseExcelFile" Grid.Column="2" Click="btnChooseExcelFile_Click">...</Button>
+                <Button Name="btnReload" Grid.Column="3" Margin="4,0,0,8" Click="btnReload_Click" IsEnabled="False">Reload</Button>
+                <Button Name="btnRun" Grid.Column="4" Margin="10,0,0,8" IsEnabled="False" Click="btnRun_Click">Run</Button>
+            </Grid>
+        </StackPanel>
+
+        <Border Grid.Row="1">
+            <TextBox Name="txtLog" AcceptsReturn="True" Focusable="False" FontFamily="Consolas">Select a file...</TextBox>
         </Border>
     </Grid>
 </Window>
