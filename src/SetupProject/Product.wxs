@@ -43,18 +43,43 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="ProductComponent" Guid="3B1B5A38-8FFD-4AFB-B909-C3256EEABBCA">
-        <File Id="AutoFormEXE" KeyPath="yes" Name="AutoForm.exe" Source="$(var.Mastersign.AutoForm.TargetDir)\AutoForm.exe">
+        <File Id="MainEXE" KeyPath="yes" Name="AutoForm.exe" Source="$(var.Mastersign.AutoForm.TargetPath)">
           <Shortcut Id="startmenuMainProgram" Directory="ProgramMenuDir" Name="AutoForm"
                     WorkingDirectory="INSTALLDIR" Icon="AutoForm.ico" IconIndex="0" Advertise="yes" />
         </File>
+        <File Id="MainCONFIG" Name="AutoForm.exe.config" Source="$(var.Mastersign.AutoForm.TargetPath).config" />
         <RemoveFolder Id="ProgramMenuDir" On="uninstall" Directory="ProgramMenuDir" />
       </Component>
 
       <Component Id="DependencyMaterialIcons" Guid="39DE66DC-271B-4340-AAAF-7E72AB42F348">
         <File Id="MaterialIconsDLL" KeyPath="yes" Name="Material.Icons.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\Material.Icons.dll" />
         <File Id="MaterialIconsWpfDLL" Name="Material.Icons.WPF.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\Material.Icons.WPF.dll" />
-        <File Id="NewtonsoftJsonDLL" Name="Newtonsoft.Json.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\Newtonsoft.Json.dll" />
       </Component>
-    </ComponentGroup>
+      
+      <Component Id="DependencyClosedXML" Guid="15D76570-4063-4542-A1BC-C2BAA7C875F1">
+        <File Id="ClosedXmlDLL" KeyPath="yes" Name="ClosedXML.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\ClosedXML.dll" />
+        <File Id="DocumentFormatOpenXmlDLL" Name="DocumentFormat.OpenXml.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\DocumentFormat.OpenXml.dll" />
+        <File Id="ExcelNumberFormatDLL" Name="ExcelNumberFormat.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\ExcelNumberFormat.dll" />
+      </Component>
+
+      <Component Id="DependencyPuppeteerSharp" Guid="5BB3C550-957B-4E92-A0CB-BEAED5E4BF73">
+        <File Id="PuppeteerSharpDLL" KeyPath="yes" Name="PuppeteerSharp.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\PuppeteerSharp.dll" />
+      </Component>
+
+      <Component Id="DependencyNewtonsoftJson" Guid="CB275321-0991-4D8D-A710-0C47F5108050">
+        <File Id="NewtonsoftJsonDLL" KeyPath="yes" Name="Newtonsoft.Json.dll" Source="$(var.Mastersign.AutoForm.TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+
+      <Component Id="DependencySharpZipLib" Guid="66BB3491-D8B4-4362-B13D-8A997B65B11D">
+        <File Id="SharpZipLibDLL" KeyPath="yes" Name="ICSharpCode.SharpZipLib.dll" Source="$(var.Mastersign.AutoForm.TargetDir)ICSharpCode.SharpZipLib.dll" />
+      </Component>
+
+      <Component Id="SystemDependencies" Guid="47EFFD33-DF52-4B4A-AFC6-D803B543CD16">
+        <File Id="NetstandardDLL" KeyPath="yes" Name="netstandard.dll" Source="$(var.Mastersign.AutoForm.TargetDir)netstandard.dll" />
+      </Component>
+      
+      <?include SystemComponents.xml ?>
+ 
+  </ComponentGroup>
   </Fragment>
 </Wix>
