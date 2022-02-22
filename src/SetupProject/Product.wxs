@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="EB8E8A65-D0F2-4739-9D41-592EF8B9DB8D"
+           Name="Mastersign AutoForm"
+           Manufacturer="Tobias Kiertscher"
+           Language="1033"
+           Version="1.0.0.0"
+           UpgradeCode="73A23A01-93DF-4500-A004-E9C12329B266">
+
+    <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- https://www.firegiant.com/wix/tutorial/user-interface/ui-wizardry/ -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <Icon Id="AutoForm.ico" SourceFile="$(var.Mastersign.AutoForm.ProjectDir)\Icon.ico" />
+
+    <Feature Id="Complete" Title="Mastersign AutoForm"
+             Description="Excel based automated web form filling"
+             Level="1"
+             ConfigurableDirectory="INSTALLFOLDER">
+      
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="MastersignFolder" Name="Mastersign">
+          <Directory Id="INSTALLFOLDER" Name="AutoForm" />
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="Mastersign AutoForm" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ProductComponent" Guid="3B1B5A38-8FFD-4AFB-B909-C3256EEABBCA">
+        <File Id="AutoFormEXE" KeyPath="yes" Name="AutoForm.exe" Source="$(var.Mastersign.AutoForm.TargetDir)\AutoForm.exe">
+          <Shortcut Id="startmenuMainProgram" Directory="ProgramMenuDir" Name="AutoForm"
+                    WorkingDirectory="INSTALLDIR" Icon="AutoForm.ico" IconIndex="0" Advertise="yes" />
+        </File>
+        <RemoveFolder Id="ProgramMenuDir" On="uninstall" Directory="ProgramMenuDir" />
+      </Component>
+
+      <Component Id="DependencyMaterialIcons" Guid="39DE66DC-271B-4340-AAAF-7E72AB42F348">
+        <File Id="MaterialIconsDLL" KeyPath="yes" Name="Material.Icons.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\Material.Icons.dll" />
+        <File Id="MaterialIconsWpfDLL" Name="Material.Icons.WPF.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\Material.Icons.WPF.dll" />
+        <File Id="NewtonsoftJsonDLL" Name="Newtonsoft.Json.dll" Source="$(var.Mastersign.AutoForm.TargetDir)\Newtonsoft.Json.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
