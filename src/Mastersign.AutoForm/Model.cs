@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Mastersign.AutoForm
@@ -17,21 +18,48 @@ namespace Mastersign.AutoForm
 
         public List<Action> Actions { get; set; } = new List<Action>();
 
+        public List<string> RecordColumns { get; set; } = new List<string>();
+
+        public List<Dictionary<string, string>> Records { get; set; } = new List<Dictionary<string, string>>();
+
         public int SkippedActions { get; set; }
 
         public bool HasErrors => Errors.Any();
 
         private string ErrorString => HasErrors
-            ? "Errors:\n\t" + string.Join("\n\t", Errors)
+            ? Errors.Count + "\n\t- " + string.Join("\n\t- ", Errors)
             : "No Errors";
 
+        private string ActionListString => $"   Actions    \n-------------\n{string.Join("\n", Actions)}";
+
+        private string RecordSchemaString => RecordColumns.Any()
+            ? "\n\t- " + string.Join("\n\t- ", RecordColumns)
+            : "None";
+
         public override string ToString() =>
-            $"Automation Project\n\tName: {Name}\n\tDescription: {Description}\n" +
-            $"{ErrorString}\n--- Actions ---\n{string.Join("\n", Actions)}";
+            "Automation Project" +
+            $"\n\tName:            {Name}" +
+            $"\n\tDescription:     {Description}" +
+            $"\n\tActions:         {Actions.Count}" +
+            $"\n\tSkipped Actions: {SkippedActions}" +
+            $"\n\tRecords:         {Records.Count}" +
+            $"\n\tRecord Columns:   {RecordColumns.Count}" +
+            $"\nRecord Schema: {RecordSchemaString}" +
+            $"\nErrors: {ErrorString}" +
+            $"\n\n{ActionListString}";
     }
 
     abstract class Action
     {
+        public virtual Action Substitute(Dictionary<string, string> record) => (Action)MemberwiseClone();
+
+        static readonly Regex placeholderPattern = new Regex(@"\$\((?<name>[^\)]+)\)");
+
+        protected static string Substitute(string s, Dictionary<string, string> record)
+            => placeholderPattern.Replace(s,
+                m => record.TryGetValue(m.Groups["name"].Value, out var value)
+                    ? value
+                    : $"?({m.Groups["name"].Value})");
     }
 
     class PauseAction : Action
@@ -39,6 +67,13 @@ namespace Mastersign.AutoForm
         public string Label { get; set; } = "Waiting for user to proceed";
 
         public override string ToString() => $"Pause: {Label}";
+
+        public override Action Substitute(Dictionary<string, string> record)
+        {
+            var result = (PauseAction)base.Substitute(record);
+            result.Label = Substitute(Label, record);
+            return result;
+        }
     }
 
     class NavigateAction : Action
@@ -48,6 +83,13 @@ namespace Mastersign.AutoForm
         public int Timeout { get; set; } = 5000;
 
         public override string ToString() => $"Navigate: {Url}";
+
+        public override Action Substitute(Dictionary<string, string> record)
+        {
+            var result = (NavigateAction)base.Substitute(record);
+            result.Url = Substitute(Url, record);
+            return result;
+        }
     }
 
     class DelayAction : Action
@@ -62,6 +104,13 @@ namespace Mastersign.AutoForm
         public string Selector { get; set; }
 
         public int Timeout { get; set; } = 500;
+
+        public override Action Substitute(Dictionary<string, string> record)
+        {
+            var result = (TargetedAction)base.Substitute(record);
+            result.Selector = Substitute(Selector, record);
+            return result;
+        }
     }
 
     class CheckTextAction : TargetedAction
@@ -69,6 +118,13 @@ namespace Mastersign.AutoForm
         public string Text { get; set; }
 
         public override string ToString() => $"CheckText: {Selector} for '{Text}' (Timeout = {Timeout}ms)";
+
+        public override Action Substitute(Dictionary<string, string> record)
+        {
+            var result = (CheckTextAction)base.Substitute(record);
+            result.Text = Substitute(Text, record);
+            return result;
+        }
     }
 
     class ClickAction : TargetedAction
@@ -88,6 +144,13 @@ namespace Mastersign.AutoForm
         public string Value { get; set; }
 
         public override string ToString() => $"Input: {Selector} (Timeout = {Timeout}ms)";
+
+        public override Action Substitute(Dictionary<string, string> record)
+        {
+            var result = (InputAction)base.Substitute(record);
+            result.Value = Substitute(Value, record);
+            return result;
+        }
     }
 
     class FormAction : TargetedAction
@@ -95,6 +158,17 @@ namespace Mastersign.AutoForm
         public List<FormField> Inputs { get; set; } = new List<FormField>();
 
         public override string ToString() => $"Form: {Selector} (Timeout = {Timeout}ms)\n\t{string.Join("\n\t", Inputs)}";
+
+        public override Action Substitute(Dictionary<string, string> record)
+        {
+            var result = (FormAction)base.Substitute(record);
+            result.Inputs = Inputs.Select(f => new FormField
+            {
+                Name = Substitute(f.Name, record),
+                Value = Substitute(f.Value, record),
+            }).ToList();
+            return result;
+        }
     }
 
     class FormField

@@ -220,6 +220,37 @@ namespace Mastersign.AutoForm
                         }
                     }
                 }
+
+                if (wb.TryGetWorksheet("Records", out var wsRecords))
+                {
+                    var headerRow = wsRecords.Row(1);
+                    if (!headerRow.IsEmpty())
+                    {
+                        var recordRowLimit = wsRecords.LastRowUsed().RowNumber();
+                        var columNames = headerRow.CellsUsed().ToDictionary(
+                            c => c.Address.ColumnNumber,
+                            c => c.GetValue<string>());
+                        ap.RecordColumns = columNames.Keys.OrderBy(c => c).Select(c => columNames[c]).ToList();
+
+                        for (var row = 2; row <= recordRowLimit; row++)
+                        {
+                            var empty = true;
+                            var record = new Dictionary<string, string>();
+                            foreach (var col in columNames.Keys)
+                            {
+                                var recordCell = wsRecords.Cell(row, col);
+                                if (recordCell.IsEmpty()) continue;
+                                empty = false;
+                                var value = recordCell.GetValue<string>();
+                                record[columNames[col]] = value;
+                            }
+                            if (!empty)
+                            {
+                                ap.Records.Add(record);
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

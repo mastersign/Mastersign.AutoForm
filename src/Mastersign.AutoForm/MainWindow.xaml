@@ -8,14 +8,17 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="570" Width="740" Icon="/Icon.ico" Loaded="Window_Loaded">
     <Window.Resources>
-        <ResourceDictionary>
-            <Style TargetType="TextBlock">
-                <Setter Property="Margin" Value="0,0,0,4" />
-            </Style>
-            <Style TargetType="Button">
-                <Setter Property="Padding" Value="8,4" />
-            </Style>
-        </ResourceDictionary>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+        <Style x:Key="NavButton">
+            <Setter Property="Control.Padding" Value="4,2,4,0" />
+            <Setter Property="Control.Margin" Value="0,0,4,0" />
+            <Setter Property="Control.VerticalAlignment" Value="Center" />
+        </Style>
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -68,21 +71,21 @@
                 <Label Grid.Column="0" Padding="0,4,4,0"  Margin="0,0,0,4" VerticalAlignment="Center">Excel File:</Label>
                 <TextBox Name="txtExcelFile" Grid.Column="1" VerticalAlignment="Center" Margin="0,4,6,0" IsEnabled="False"></TextBox>
                 <Button Name="btnChooseExcelFile" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,4,0"
-                        IsEnabled="True" Click="btnChooseExcelFile_Click">
+                        IsEnabled="True" Click="btnChooseExcelFile_Click" ToolTip="Open an Excel file as automation script.">
                     <StackPanel Orientation="Horizontal">
                         <mi:MaterialIcon Kind="FolderOpen" Margin="0,2,4,0" />
                         <TextBlock>Open</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="btnReload" Grid.Column="3" VerticalAlignment="Center" Margin="0,0,10,0"
-                        IsEnabled="False" Click="btnReload_Click">
+                        IsEnabled="False" Click="btnReload_Click" ToolTip="Reload the previously opened Excel file.">
                     <StackPanel Orientation="Horizontal">
                         <mi:MaterialIcon Kind="Reload" Margin="0,1,4,0" />
                         <TextBlock>Reload</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="btnRun" Grid.Column="4" VerticalAlignment="Center"
-                        IsEnabled="False" Click="btnRun_Click" >
+                        IsEnabled="False" Click="btnRun_Click" ToolTip="Run the automation script." >
                     <StackPanel Orientation="Horizontal">
                         <mi:MaterialIcon Kind="Play" Margin="0,1,4,0" />
                         <TextBlock>Play</TextBlock>
@@ -91,8 +94,41 @@
             </Grid>
         </StackPanel>
 
-        <Grid Grid.Row="1">
-
+        <Grid Name="gridRecordControl" Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Name="lblRecordControls" IsEnabled="False" Content="Records:" />
+            <Button Name="btnRecordFirst" Grid.Column="1" Style="{StaticResource NavButton}" 
+                    IsEnabled="False" Click="btnRecordFirst_Click">
+                <mi:MaterialIcon Kind="ChevronLeftFirst" />
+            </Button>
+            <Button Name="btnRecordPrevious" Grid.Column="2" Style="{StaticResource NavButton}"
+                    IsEnabled="False" Click="btnRecordPrevious_Click">
+                <mi:MaterialIcon Kind="ChevronLeft" />
+            </Button>
+            <TextBox Name="lblRecordNumber" Grid.Column="3" IsEnabled="false"
+                     Width="48" Margin="0,0,4,0" VerticalAlignment="Center"/>
+            <Button Name="btnRecordNext"  Grid.Column="4" Style="{StaticResource NavButton}"
+                    IsEnabled="False" Click="btnRecordNext_Click">
+                <mi:MaterialIcon Kind="ChevronRight" />
+            </Button>
+            <Button Name="btnRecordLast"  Grid.Column="5" Style="{StaticResource NavButton}"
+                    IsEnabled="False" Click="btnRecordLast_Click">
+                <mi:MaterialIcon Kind="ChevronRightLast" />
+            </Button>
+            <CheckBox Name="chkOnlyCurrent" Grid.Column="6" IsEnabled="False"
+                      HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0"
+                      Content="Only current" ToolTip="Play script only for the current record, instead of iterating through all."/>
+            <CheckBox Name="chkNoPause" Grid.Column="7" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                      Content="No pauses" ToolTip="Skip all Pause actions during playback."/>
         </Grid>
 
         <TabControl Grid.Row="2">
@@ -151,16 +187,26 @@
                             BorderThickness="1,1,1,1">
                         <ScrollViewer 
                                   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <TextBlock Name="txtErrors" TextWrapping="WrapWithOverflow" />
+                            <TextBlock Name="txtErrors" TextWrapping="WrapWithOverflow" Padding="4" />
                         </ScrollViewer>
                     </Border>
 
                 </Grid>
             </TabItem>
+            <TabItem Header="Current Record">
+                <ListView Name="lstRecords" BorderThickness="0" Margin="0">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Key}" Header="Column" Width="Auto"/>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Value}" Header="Value" Width="Auto"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
             <TabItem Header="Details">
-                <Border Grid.Row="1">
-                    <TextBox Name="txtLog" AcceptsReturn="True" Focusable="False" FontFamily="Consolas">Select a file...</TextBox>
-                </Border>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <TextBlock Name="tLog" FontFamily="Consolas" Padding="6" TextWrapping="WrapWithOverflow">Select a file...</TextBlock>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>

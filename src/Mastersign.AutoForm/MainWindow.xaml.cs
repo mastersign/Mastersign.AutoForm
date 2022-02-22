@@ -26,6 +26,8 @@ namespace Mastersign.AutoForm
         private AutomationProject Project { get; set; }
 
         private ScriptRunner Runner { get; }
+        private int? RecordNumber { get; set; }
+        private Dictionary<string, string> Record { get; set; }
 
         public MainWindow()
         {
@@ -65,8 +67,8 @@ namespace Mastersign.AutoForm
             txtExcelFile.Text = filename;
             var factory = new AutomationProjectFactory();
             Project = factory.ParseExcelFile(filename);
-            txtLog.Text = Project.ToString();
-            txtLog.Foreground = Project.HasErrors ? Brushes.Maroon : SystemColors.ControlTextBrush;
+            tLog.Text = Project.ToString();
+            tLog.Foreground = Project.HasErrors ? Brushes.Maroon : SystemColors.ControlTextBrush;
             btnRun.IsEnabled = !Project.HasErrors;
             iconOK.Visibility = Project.HasErrors ? Visibility.Hidden : Visibility.Visible;
             iconError.Visibility = Project.HasErrors ? Visibility.Visible : Visibility.Hidden;
@@ -77,6 +79,16 @@ namespace Mastersign.AutoForm
             lblViewport.Content = $"{viewportWidth} ⨉ {viewportHeight} px";
             lblActions.Content = Project.Actions.Count.ToString();
             lblSkippedActions.Content = Project.SkippedActions.ToString();
+            if (Project.Records.Count > 0)
+            {
+                lblRecords.Content = Project.Records.Count.ToString();
+                RecordNumber = 0;
+            }
+            else
+            {
+                lblRecords.Content = "none";
+            }
+            UpdateRecordUI();
             if (Project.HasErrors)
             {
                 txtErrors.Text = string.Join("\n", Project.Errors);
@@ -87,6 +99,35 @@ namespace Mastersign.AutoForm
                 await Runner.Initialize(Project);
             }
             btnReload.IsEnabled = true;
+        }
+
+        private void UpdateRecordUI()
+        {
+            if (RecordNumber.HasValue)
+            {
+                lblRecordControls.IsEnabled = true;
+                var no = RecordNumber.Value;
+                lblRecordNumber.Text = (no + 1).ToString();
+                btnRecordFirst.IsEnabled = no > 0;
+                btnRecordPrevious.IsEnabled = no > 0;
+                btnRecordNext.IsEnabled = no < Project.Records.Count - 1;
+                btnRecordLast.IsEnabled = no < Project.Records.Count - 1;
+                chkOnlyCurrent.IsEnabled = true;
+                lstRecords.ItemsSource = Project.RecordColumns
+                    .Select(col => new KeyValuePair<string, string>(
+                        col, Project.Records[RecordNumber.Value][col]));
+            }
+            else
+            {
+                lblRecordControls.IsEnabled = false;
+                lblRecordNumber.Text = string.Empty;
+                btnRecordFirst.IsEnabled = false;
+                btnRecordPrevious.IsEnabled = false;
+                btnRecordNext.IsEnabled = false;
+                btnRecordLast.IsEnabled = false;
+                chkOnlyCurrent.IsEnabled = false;
+                lstRecords.ItemsSource = null;
+            }
         }
 
         private void btnChooseExcelFile_Click(object sender, RoutedEventArgs e)
@@ -120,19 +161,21 @@ namespace Mastersign.AutoForm
                 btnRun.IsEnabled = false;
 
                 await Runner.Initialize(Project);
-                foreach (var action in Project.Actions)
+                if (Project.Records.Count == 0 || chkOnlyCurrent.IsChecked == true)
                 {
-                    if (action is PauseAction pauseAction)
+                    await ExecuteActions();
+                }
+                else
+                {
+                    for (var i = 0; i < Project.Records.Count; i++)
                     {
-                        var result = MessageBox.Show(this, pauseAction.Label, "AutoForm Pause",
-                            MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                        if (result == MessageBoxResult.Cancel) break;
-                    }
-                    else
-                    {
-                        await Runner.Run(action);
+                        RecordNumber = i;
+                        UpdateRecordUI();
+                        var uninterrupted = await ExecuteActions();
+                        if (!uninterrupted) break;
                     }
                 }
+                
                 MessageBox.Show(this, "Automation finished.", "AutoForm Finish",
                     MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -147,6 +190,68 @@ namespace Mastersign.AutoForm
                 btnReload.IsEnabled = true;
                 btnChooseExcelFile.IsEnabled = true;
             }
+        }
+
+        private async Task<bool> ExecuteActions()
+        {
+            foreach (var action in Project.Actions)
+            {
+                var a = RecordNumber.HasValue
+                    ? action.Substitute(Project.Records[RecordNumber.Value])
+                    : action;
+                if (a is PauseAction pauseAction)
+                {
+                    if (chkNoPause.IsChecked == true) continue;
+                    var result = MessageBox.Show(this, pauseAction.Label, "AutoForm Pause",
+                        MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                    if (result == MessageBoxResult.Cancel) return false;
+                }
+                else
+                {
+                    await Runner.Run(a);
+                }
+            }
+            return true;
+        }
+
+        private void btnRecordFirst_Click(object sender, RoutedEventArgs e)
+        {
+            if (Project == null || Project.Records.Count == 0)
+                RecordNumber = null;
+            else
+                RecordNumber = 0;
+            UpdateRecordUI();
+        }
+
+        private void btnRecordPrevious_Click(object sender, RoutedEventArgs e)
+        {
+            if (Project == null || Project.Records.Count == 0)
+                RecordNumber = null;
+            else if (RecordNumber == null)
+                RecordNumber = Project.Records.Count - 1;
+            else
+                RecordNumber = Math.Max(0, RecordNumber.Value - 1);
+            UpdateRecordUI();
+        }
+
+        private void btnRecordNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (Project == null || Project.Records.Count == 0)
+                RecordNumber = null;
+            else if (RecordNumber == null)
+                RecordNumber = 0;
+            else
+                RecordNumber = Math.Min(Project.Records.Count - 1, RecordNumber.Value + 1);
+            UpdateRecordUI();
+        }
+
+        private void btnRecordLast_Click(object sender, RoutedEventArgs e)
+        {
+            if (Project == null || Project.Records.Count == 0)
+                RecordNumber = null;
+            else
+                RecordNumber = Project.Records.Count - 1;
+            UpdateRecordUI();
         }
     }
 }
