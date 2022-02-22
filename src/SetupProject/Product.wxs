@@ -14,6 +14,9 @@
 
     <!-- https://www.firegiant.com/wix/tutorial/user-interface/ui-wizardry/ -->
     <UIRef Id="WixUI_InstallDir" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)..\LICENSE.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="Banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Dialog.bmp" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
     <Icon Id="AutoForm.ico" SourceFile="$(var.Mastersign.AutoForm.ProjectDir)\Icon.ico" />
