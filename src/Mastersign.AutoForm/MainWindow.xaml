@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mi="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
         xmlns:local="clr-namespace:Mastersign.AutoForm"
         mc:Ignorable="d"
-        Title="MainWindow" Height="570" Width="740" Icon="/Icon.ico">
+        Title="MainWindow" Height="570" Width="740" Icon="/Icon.ico" Loaded="Window_Loaded">
     <Window.Resources>
         <ResourceDictionary>
             <Style TargetType="TextBlock">
@@ -13,24 +14,48 @@
             </Style>
             <Style TargetType="Button">
                 <Setter Property="Padding" Value="8,4" />
-                <Setter Property="Margin" Value="0,0,0,8" />
             </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical" Margin="0,0,0,10">
-            <TextBlock FontSize="24" Margin="0,0,0,10">AutoForm</TextBlock>
-            <TextBlock>
-                Download a template file and define your automation script.
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock FontSize="36" Margin="0,0,0,10" FontWeight="Light">AutoForm</TextBlock>
+                <Image Grid.Column="1" Margin="8,4,10,8" Source="/Icon_64x.png" Width="64" Height="64" />
+            </Grid>
+            <TextBlock Name="tBrowserWarning" Visibility="Collapsed"
+                       Foreground="Red" FontSize="14" FontWeight="Bold" Margin="0,10,0,10">
+                The Google Chrome Browser could not be found.
             </TextBlock>
-            <Button Name="btnDownloadTemplate" HorizontalAlignment="Right" Click="btnDownloadTemplate_Click">Download Template</Button>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center">
+                    Save the template Excel file and define your automation script.
+                </TextBlock>
+                <Button Name="btnDownloadTemplate"
+                        Grid.Column="1" VerticalAlignment="Center"
+                        Click="btnDownloadTemplate_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <mi:MaterialIcon Kind="Download" Margin="0,2,4,0" />
+                        <TextBlock>Save Template</TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
             <TextBlock>
-                Select an Excel file with the automation script and press RUN.
+                Select an Excel file with an automation script and press the Play button.
             </TextBlock>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -40,16 +65,103 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Padding="0,4,4,0"  Margin="0,0,0,4">Excel File:</Label>
-                <TextBox Name="txtExcelFile" Grid.Column="1" VerticalAlignment="Top" Margin="0,4,6,0" IsEnabled="False"></TextBox>
-                <Button Name="btnChooseExcelFile" Grid.Column="2" Click="btnChooseExcelFile_Click">...</Button>
-                <Button Name="btnReload" Grid.Column="3" Margin="4,0,0,8" Click="btnReload_Click" IsEnabled="False">Reload</Button>
-                <Button Name="btnRun" Grid.Column="4" Margin="10,0,0,8" IsEnabled="False" Click="btnRun_Click">Run</Button>
+                <Label Grid.Column="0" Padding="0,4,4,0"  Margin="0,0,0,4" VerticalAlignment="Center">Excel File:</Label>
+                <TextBox Name="txtExcelFile" Grid.Column="1" VerticalAlignment="Center" Margin="0,4,6,0" IsEnabled="False"></TextBox>
+                <Button Name="btnChooseExcelFile" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,4,0"
+                        IsEnabled="True" Click="btnChooseExcelFile_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <mi:MaterialIcon Kind="FolderOpen" Margin="0,2,4,0" />
+                        <TextBlock>Open</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnReload" Grid.Column="3" VerticalAlignment="Center" Margin="0,0,10,0"
+                        IsEnabled="False" Click="btnReload_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <mi:MaterialIcon Kind="Reload" Margin="0,1,4,0" />
+                        <TextBlock>Reload</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnRun" Grid.Column="4" VerticalAlignment="Center"
+                        IsEnabled="False" Click="btnRun_Click" >
+                    <StackPanel Orientation="Horizontal">
+                        <mi:MaterialIcon Kind="Play" Margin="0,1,4,0" />
+                        <TextBlock>Play</TextBlock>
+                    </StackPanel>
+                </Button>
             </Grid>
         </StackPanel>
 
-        <Border Grid.Row="1">
-            <TextBox Name="txtLog" AcceptsReturn="True" Focusable="False" FontFamily="Consolas">Select a file...</TextBox>
-        </Border>
+        <Grid Grid.Row="1">
+
+        </Grid>
+
+        <TabControl Grid.Row="2">
+            <TabItem Header="Summary">
+                <Grid Margin="4,6,6,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <mi:MaterialIcon Name="iconOK" Visibility="Hidden"
+                                     Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                     Kind="CheckCircle" Foreground="#FF06A906"
+                                     Margin="10,5"
+                                     Height="40" Width="40" />
+
+                    <mi:MaterialIcon Name="iconError" Visibility="Hidden"
+                                     Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                     Kind="CloseCircle" Foreground="#FFE02222"
+                                     Margin="10,5"
+                                     Height="40" Width="40" />
+
+                    <Label Grid.Row="0" Visibility="Collapsed" HorizontalAlignment="Right">Name</Label>
+                    <Label Name="lblProjectName" Grid.Row="0" Grid.Column="1" FontWeight="Bold" Content="" />
+
+                    <Label Grid.Row="1" Visibility="Collapsed" HorizontalAlignment="Right">Description</Label>
+                    <Label Name="lblProjectDescription" Grid.Row="1" Grid.Column="1" FontStyle="Italic" Content="" />
+
+                    <Label Grid.Row="2" Visibility="Visible" HorizontalAlignment="Right">Viewport</Label>
+                    <Label Name="lblViewport" Grid.Row="2" Grid.Column="1" Content="0 x 0 px" />
+
+                    <Label Grid.Row="3" Visibility="Visible" HorizontalAlignment="Right">Actions</Label>
+                    <Label Name="lblActions" Grid.Row="3" Grid.Column="1" Content="0" />
+
+                    <Label Grid.Row="4" Visibility="Visible" HorizontalAlignment="Right">Skipped Actions</Label>
+                    <Label Name="lblSkippedActions" Grid.Row="4" Grid.Column="1" Content="0" />
+
+                    <Label Grid.Row="5" Visibility="Visible" HorizontalAlignment="Right">Records</Label>
+                    <Label Name="lblRecords" Grid.Row="5" Grid.Column="1" Content="None" />
+
+                    <Label Grid.Row="6" Visibility="Visible" HorizontalAlignment="Right">Errors</Label>
+                    <Border Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2"
+                            Margin="0,4,0,0"
+                            SnapsToDevicePixels="True"
+                            BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                            BorderThickness="1,1,1,1">
+                        <ScrollViewer 
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <TextBlock Name="txtErrors" TextWrapping="WrapWithOverflow" />
+                        </ScrollViewer>
+                    </Border>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Details">
+                <Border Grid.Row="1">
+                    <TextBox Name="txtLog" AcceptsReturn="True" Focusable="False" FontFamily="Consolas">Select a file...</TextBox>
+                </Border>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

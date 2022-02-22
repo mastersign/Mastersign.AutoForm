@@ -32,31 +32,49 @@ namespace Mastersign.AutoForm
                     var sectionCell = ws.Cell(row, 1);
                     var section = sectionCell.GetValue<string>();
                     var skip = false;
-                    switch (section)
+                    switch (section.ToLowerInvariant())
                     {
-                        case "Name":
+                        case "name":
                             actions = null;
                             var nameCell = ws.Cell(row, 2);
                             ap.Name = nameCell.GetValue<string>();
                             break;
-                        case "Description":
+                        case "description":
                             actions = null;
                             var descriptionCell = ws.Cell(row, 2);
                             ap.Description = descriptionCell.GetValue<string>();
                             break;
-                        case "Actions":
+                        case "viewport width":
+                        case "width":
+                            actions = null;
+                            var viewportWidthCell = ws.Cell(row, 2);
+                            if (viewportWidthCell.TryGetValue(out int viewportWidth))
+                                ap.ViewportWidth = viewportWidth;
+                            else
+                                ap.ViewportWidth = null;
+                            break;
+                        case "viewport height":
+                        case "height":
+                            actions = null;
+                            var viewportHeightCell = ws.Cell(row, 2);
+                            if (viewportHeightCell.TryGetValue(out int viewportHeight))
+                                ap.ViewportHeight = viewportHeight;
+                            else
+                                ap.ViewportHeight = null;
+                            break;
+                        case "actions":
                             actions = ap.Actions;
                             break;
-                        case "Skip":
+                        case "skip":
                             skip = true;
                             break;
                         default:
                             // ignore
                             break;
                     }
-                    if (skip) continue;
                     if (actions != null)
                     {
+                        Action newAction = null;
                         var actionTypeCell = ws.Cell(row, 2);
                         var actionType = actionTypeCell.GetValue<string>();
                         var p1Cell = ws.Cell(row, 3);
@@ -86,12 +104,12 @@ namespace Mastersign.AutoForm
                                 if (p1Cell.TryGetValue(out string pauseLabel) &&
                                     !string.IsNullOrWhiteSpace(pauseLabel))
                                     pauseAction.Label = pauseLabel;
-                                actions.Add(pauseAction);
+                                newAction = pauseAction;
                                 break;
                             case "Delay":
                                 currentFormAction = null;
                                 if (p1Cell.TryGetValue(out int duration))
-                                    actions.Add(new DelayAction { Duration = duration });
+                                    newAction = new DelayAction { Duration = duration };
                                 else
                                     ap.Errors.Add($"No valid duration for {actionType} action in row {row}");
                                 break;
@@ -103,7 +121,7 @@ namespace Mastersign.AutoForm
                                     var navigateAction = new NavigateAction { Url = uri.ToString() };
                                     if (p2Cell.TryGetValue(out int timeout))
                                         navigateAction.Timeout = timeout;
-                                    actions.Add(navigateAction);
+                                    newAction = navigateAction;
                                 }
                                 else
                                     ap.Errors.Add($"No valid URL for {actionType} action in row {row}");
@@ -118,7 +136,7 @@ namespace Mastersign.AutoForm
                                         waitForAction.Visible = visibile;
                                     if (p3Cell.TryGetValue(out int timeout))
                                         waitForAction.Timeout = timeout;
-                                    actions.Add(waitForAction);
+                                    newAction = waitForAction;
                                 }
                                 else
                                     ap.Errors.Add($"No selector given for {actionType} action in row {row}");
@@ -131,7 +149,7 @@ namespace Mastersign.AutoForm
                                     var clickAction = new ClickAction { Selector = clickSelector };
                                     if (p2Cell.TryGetValue(out int timeout))
                                         clickAction.Timeout = timeout;
-                                    actions.Add(clickAction);
+                                    newAction = clickAction;
                                 }
                                 else
                                     ap.Errors.Add($"No selector given for {actionType} action in row {row}");
@@ -151,7 +169,7 @@ namespace Mastersign.AutoForm
                                         };
                                         if (p3Cell.TryGetValue(out int timeout))
                                             checkTextAction.Timeout = timeout;
-                                        actions.Add(checkTextAction);
+                                        newAction = checkTextAction;
                                     }
                                     else
                                         ap.Errors.Add($"No text given for {actionType} action in row {row}");
@@ -171,7 +189,7 @@ namespace Mastersign.AutoForm
                                     };
                                     if (p3Cell.TryGetValue(out int timeout))
                                         inputAction.Timeout = timeout;
-                                    actions.Add(inputAction);
+                                    newAction = inputAction;
                                 }
                                 else
                                     ap.Errors.Add($"No selector given for {actionType} action in row {row}");
@@ -183,7 +201,7 @@ namespace Mastersign.AutoForm
                                     var formAction = new FormAction { Selector = formSelector };
                                     if (p2Cell.TryGetValue(out int formTimeout))
                                         formAction.Timeout = formTimeout;
-                                    actions.Add(formAction);
+                                    newAction = formAction;
                                     currentFormAction = formAction;
                                 }
                                 else
@@ -192,6 +210,13 @@ namespace Mastersign.AutoForm
                             default:
                                 // ignore
                                 break;
+                        }
+                        if (newAction != null)
+                        {
+                            if (skip)
+                                ap.SkippedActions++;
+                            else
+                                actions.Add(newAction);
                         }
                     }
                 }

@@ -25,9 +25,18 @@ namespace Mastersign.AutoForm
     {
         private AutomationProject Project { get; set; }
 
+        private ScriptRunner Runner { get; }
+
         public MainWindow()
         {
             InitializeComponent();
+            Runner = new ScriptRunner();
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await Runner.Initialize(null);
+            tBrowserWarning.Visibility = Runner.IsReady ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
@@ -51,7 +60,7 @@ namespace Mastersign.AutoForm
             }
         }
 
-        private void LoadAutomationProject(string filename)
+        private async void LoadAutomationProject(string filename)
         {
             txtExcelFile.Text = filename;
             var factory = new AutomationProjectFactory();
@@ -59,6 +68,24 @@ namespace Mastersign.AutoForm
             txtLog.Text = Project.ToString();
             txtLog.Foreground = Project.HasErrors ? Brushes.Maroon : SystemColors.ControlTextBrush;
             btnRun.IsEnabled = !Project.HasErrors;
+            iconOK.Visibility = Project.HasErrors ? Visibility.Hidden : Visibility.Visible;
+            iconError.Visibility = Project.HasErrors ? Visibility.Visible : Visibility.Hidden;
+            lblProjectName.Content = Project.Name;
+            lblProjectDescription.Content = Project.Description;
+            var viewportWidth = Project.ViewportWidth.HasValue ? Project.ViewportWidth.ToString() : "auto";
+            var viewportHeight = Project.ViewportHeight.HasValue ? Project.ViewportHeight.ToString() : "auto";
+            lblViewport.Content = $"{viewportWidth} ⨉ {viewportHeight} px";
+            lblActions.Content = Project.Actions.Count.ToString();
+            lblSkippedActions.Content = Project.SkippedActions.ToString();
+            if (Project.HasErrors)
+            {
+                txtErrors.Text = string.Join("\n", Project.Errors);
+            }
+            else
+            {
+                txtErrors.Text = string.Empty;
+                await Runner.Initialize(Project);
+            }
             btnReload.IsEnabled = true;
         }
 
@@ -86,10 +113,13 @@ namespace Mastersign.AutoForm
         {
             if (Project == null || Project.HasErrors || Project.Actions.Count == 0) return;
 
-            var runner = new ScriptRunner();
             try
             {
-                await runner.Initialize();
+                btnChooseExcelFile.IsEnabled = false;
+                btnReload.IsEnabled = false;
+                btnRun.IsEnabled = false;
+
+                await Runner.Initialize(Project);
                 foreach (var action in Project.Actions)
                 {
                     if (action is PauseAction pauseAction)
@@ -100,9 +130,11 @@ namespace Mastersign.AutoForm
                     }
                     else
                     {
-                        await runner.Run(action);
+                        await Runner.Run(action);
                     }
                 }
+                MessageBox.Show(this, "Automation finished.", "AutoForm Finish",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -111,7 +143,9 @@ namespace Mastersign.AutoForm
             }
             finally
             {
-                runner.Dispose();
+                btnRun.IsEnabled = true;
+                btnReload.IsEnabled = true;
+                btnChooseExcelFile.IsEnabled = true;
             }
         }
     }

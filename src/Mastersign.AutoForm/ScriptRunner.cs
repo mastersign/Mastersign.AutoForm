@@ -63,8 +63,13 @@ namespace Mastersign.AutoForm
             }
         }
 
-        public async Task Initialize()
+        public async Task Initialize(AutomationProject project)
         {
+            var screenWidth = (int)System.Windows.SystemParameters.WorkArea.Width;
+            var screenHeight = (int)System.Windows.SystemParameters.WorkArea.Height;
+            var defaultViewportWidth = Math.Min(screenWidth - 20, Math.Max(1200, screenWidth / 2));
+            var defaultViewportHeight = screenHeight - 180;
+
             if (browser == null)
             {
                 // select browser, prioritize Chrome
@@ -75,9 +80,6 @@ namespace Mastersign.AutoForm
                 //if (product == Product.Firefox) executablePath = firefoxPath;
                 if (executablePath == null) throw new NotSupportedException("Google Chrome is not installed.");
 
-                var screenHeight = (int)System.Windows.SystemParameters.WorkArea.Height;
-                var screenWidth = (int)System.Windows.SystemParameters.WorkArea.Width;
-
                 browser = await Puppeteer.LaunchAsync(new LaunchOptions
                 {
                     Headless = false,
@@ -86,8 +88,8 @@ namespace Mastersign.AutoForm
                     ExecutablePath = executablePath,
                     DefaultViewport = new ViewPortOptions
                     {
-                        Width = Math.Max(960, screenWidth / 2),
-                        Height = screenHeight - 180,
+                        Width = defaultViewportWidth,
+                        Height = defaultViewportHeight,
                         IsLandscape = true,
                         HasTouch = false,
                         IsMobile = false,
@@ -96,11 +98,19 @@ namespace Mastersign.AutoForm
                 });
                 browser.Closed += (o, e) => browser = null;
             }
-            if (page == null)
+            page = await browser.NewPageAsync();
+            var pages = await browser.PagesAsync();
+            foreach (var p in pages)
             {
-                var pages = await browser.PagesAsync();
-                page = pages.Length > 0 ? pages[0] : await browser.NewPageAsync();
-                page.Close += (o, e) => page = null;
+                if (p != page) await p.CloseAsync();
+            }
+            if (project != null)
+            {
+                await page.SetViewportAsync(new ViewPortOptions
+                {
+                    Width = project.ViewportWidth ?? defaultViewportWidth,
+                    Height = project.ViewportHeight ?? defaultViewportHeight,
+                });
             }
         }
 

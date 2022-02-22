@@ -10,10 +10,14 @@ namespace Mastersign.AutoForm
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public int? ViewportWidth { get; set; }
+        public int? ViewportHeight { get; set; }
 
         public List<string> Errors { get; set; } = new List<string>();
 
         public List<Action> Actions { get; set; } = new List<Action>();
+
+        public int SkippedActions { get; set; }
 
         public bool HasErrors => Errors.Any();
 
