@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Icon.ico" />
-    <None Remove="Icon_64x.png" />
+    <Resource Include="Icon.ico" />
+    <Resource Include="Icon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,13 +24,6 @@
     <PackageReference Include="Material.Icons" Version="1.0.76" />
     <PackageReference Include="Material.Icons.WPF" Version="1.0.0" />
     <PackageReference Include="PuppeteerSharp" Version="6.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Icon.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Icon_64x.png" />
   </ItemGroup>
 
 </Project>
