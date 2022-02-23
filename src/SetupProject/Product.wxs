@@ -20,6 +20,7 @@
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
     <Icon Id="AutoForm.ico" SourceFile="$(var.Mastersign.AutoForm.ProjectDir)\Icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AutoForm.ico" />
 
     <Feature Id="Complete" Title="Mastersign AutoForm"
              Description="Excel based automated web form filling"
