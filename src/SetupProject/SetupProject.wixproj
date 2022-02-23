@@ -17,9 +17,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <CompilerAdditionalOptions>
-    </CompilerAdditionalOptions>
-    <LinkerAdditionalOptions>-ext WixUIExtension</LinkerAdditionalOptions>
+    <CompilerAdditionalOptions>-ext WixNetFxExtension</CompilerAdditionalOptions>
+    <LinkerAdditionalOptions>-ext WixUIExtension -ext WixNetFxExtension</LinkerAdditionalOptions>
+    <SuppressSpecificWarnings>1076</SuppressSpecificWarnings>
+    <SuppressPdbOutput>True</SuppressPdbOutput>
+    <Cultures>
+    </Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DefineConstants>Debug</DefineConstants>
@@ -45,10 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Banner.bmp" />
-    <Content Include="DependencyComponents.wxi" />
+    <Content Include="DependencyFiles.wxi" />
     <Content Include="Dialog.bmp" />
-    <Content Include="SelectSystemComponents.xslt" />
-    <Content Include="SystemComponents.wxi" />
+    <Content Include="SelectSystemFiles.xslt" />
+    <Content Include="SystemFiles.wxi" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
@@ -60,8 +63,8 @@
     "$(SolutionDir)Mastersign.AutoForm\bin\$(ConfigurationName)\netframework472" ^
     -srd -sreg -ag ^
     -var var.Mastersign.AutoForm.TargetDir ^
-    -t "$(ProjectDir)SelectSystemComponents.xslt" ^
-    -out "$(ProjectDir)SystemComponents.wxi"</PreBuildEvent>
+    -t "$(ProjectDir)SelectSystemFiles.xslt" ^
+    -out "$(ProjectDir)SystemFiles.wxi"</PreBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -9,7 +9,14 @@
     <xsl:template match="/">
       <Include>
         <xsl:for-each select="//wi:Component/wi:File[contains(@Source, '\System.')] | //wi:File[contains(@Source, '\Microsoft.')]">
-          <xsl:copy-of select=".."/>
+          <File>
+            <xsl:attribute name="Id">
+              <xsl:value-of select="@Id"/>
+            </xsl:attribute>
+            <xsl:attribute name="Source">
+              <xsl:value-of select="@Source"/>
+            </xsl:attribute>          
+          </File>
         </xsl:for-each>
       </Include>
     </xsl:template>
