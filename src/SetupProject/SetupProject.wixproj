@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Banner.bmp" />
+    <Content Include="DependencyComponents.wxi" />
     <Content Include="Dialog.bmp" />
     <Content Include="SelectSystemComponents.xslt" />
     <Content Include="SystemComponents.wxi" />
