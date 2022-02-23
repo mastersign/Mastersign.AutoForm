@@ -8,24 +8,8 @@
 
     <xsl:template match="/">
       <Include>
-        <xsl:for-each select="//wi:Component/wi:File[starts-with(@Source, 'SourceDir\System.')] | //wi:File[starts-with(@Source, 'SourceDir\Microsoft.')]">
-          <Component>
-            <xsl:attribute name="Id">
-              <xsl:value-of select="../@Id"/>
-            </xsl:attribute>
-            <xsl:attribute name="Guid">
-              <xsl:text>*</xsl:text>
-            </xsl:attribute>
-            <File>
-              <xsl:attribute name="Id">
-                <xsl:value-of select="@Id"/>
-              </xsl:attribute>
-              <xsl:attribute name="Source">
-                <xsl:text>$(var.Mastersign.AutoForm.TargetDir)</xsl:text>
-                <xsl:value-of select="substring-after(@Source, '\')"/>
-              </xsl:attribute>
-            </File>
-          </Component>
+        <xsl:for-each select="//wi:Component/wi:File[contains(@Source, '\System.')] | //wi:File[contains(@Source, '\Microsoft.')]">
+          <xsl:copy-of select=".."/>
         </xsl:for-each>
       </Include>
     </xsl:template>

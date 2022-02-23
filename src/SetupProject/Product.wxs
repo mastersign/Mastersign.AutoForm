@@ -81,7 +81,7 @@
         <File Id="NetstandardDLL" KeyPath="yes" Name="netstandard.dll" Source="$(var.Mastersign.AutoForm.TargetDir)netstandard.dll" />
       </Component>
       
-      <?include SystemComponents.xml ?>
+      <?include SystemComponents.wxi ?>
  
   </ComponentGroup>
   </Fragment>
