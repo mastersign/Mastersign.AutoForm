@@ -27,11 +27,11 @@ namespace Mastersign.AutoForm
 
         private ScriptRunner Runner { get; }
         private int? RecordNumber { get; set; }
-        private Dictionary<string, string> Record { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
+            Title = "Mastersign AutoForm v" + GetType().Assembly.GetName().Version.ToString(3);
             Runner = new ScriptRunner();
         }
 
