@@ -18,8 +18,9 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <CompilerAdditionalOptions>-ext WixNetFxExtension</CompilerAdditionalOptions>
-    <LinkerAdditionalOptions>-ext WixUIExtension -ext WixNetFxExtension</LinkerAdditionalOptions>
-    <SuppressSpecificWarnings>1076</SuppressSpecificWarnings>
+    <LinkerAdditionalOptions>-ext WixUIExtension -ext WixNetFxExtension -sice:ICE91</LinkerAdditionalOptions>
+    <SuppressSpecificWarnings>
+    </SuppressSpecificWarnings>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <Cultures>
     </Cultures>

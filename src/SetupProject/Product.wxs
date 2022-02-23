@@ -7,11 +7,11 @@
              increase the Product/@Version attribute
              and generate a new value for Product/@Id!
   -->
-  <Product Name="Mastersign AutoForm"
+  <Product Id="*"
+           Name="Mastersign AutoForm"
            Manufacturer="Tobias Kiertscher"
            Language="1033"
            Version="1.0.0"
-           Id="{95EEF189-EF18-4F03-9560-01839705AC22}"
            UpgradeCode="{73A23A01-93DF-4500-A004-E9C12329B266}">
 
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
@@ -20,11 +20,19 @@
 
     <!-- Settings for Installer UI -->
     <!-- https://www.firegiant.com/wix/tutorial/user-interface/ui-wizardry/ -->
-    <UIRef Id="WixUI_InstallDir" />
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)..\LICENSE.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="Banner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="Dialog.bmp" />
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+    </UI>
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    
+    <!-- Retrieve INSTALLFOLDER from previous install -->
+    <Property Id="INSTALLFOLDER">
+      <RegistrySearch Id="GetPreviousInstallFolder"
+                      Root="HKCU" Key="Software\Mastersign\AutoForm" Name="InstallFolder" Type="raw" />
+    </Property>
 
     <!-- Product Icon -->
     <Icon Id="AutoForm.ico" SourceFile="$(var.Mastersign.AutoForm.ProjectDir)\Icon.ico" />
@@ -57,7 +65,7 @@
       to automatically choose install root by OS arch for AnyCPU assemblies
       -->
       <Directory Id="AppDataFolder">
-        <Directory Id="MastersignFolder" Name="Mastersign">
+        <Directory Id="VendorFolder" Name="Mastersign">
           <Directory Id="INSTALLFOLDER" Name="AutoForm" />
         </Directory>
       </Directory>
@@ -70,32 +78,34 @@
   <!-- Components -->
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      
-      <Component Id="ProductComponent" Guid="{DB93F5EA-BA91-4D09-8EA0-BF2B77553F9B}">
+
+      <Component Id="ProductComponent" Guid="{053B35E0-8F38-4B4B-A03A-3AC2C95859E0}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm">
           <RegistryValue KeyPath="yes"
-                         Name="InstallPath" Type="string"
+                         Name="MainExe" Type="string"
                          Value="[INSTALLFOLDER]$(var.Mastersign.AutoForm.TargetFileName)" />
         </RegistryKey>
 
-        <File Id="MainEXE"
+        <File Id="MainEXE" KeyPath="no"
               Source="$(var.Mastersign.AutoForm.TargetPath)">
           <Shortcut Id="startmenuMainProgram"
                     Directory="ProgramMenuDir" Name="AutoForm"
-                    WorkingDirectory="INSTALLDIR" Icon="AutoForm.ico" IconIndex="0" Advertise="no" />
+                    WorkingDirectory="INSTALLFOLDER" Icon="AutoForm.ico" IconIndex="0" />
         </File>
+        
         <File Id="MainCONFIG" 
               Source="$(var.Mastersign.AutoForm.TargetPath).config" />
-        
-        <RemoveFolder Id="InstallFolder" On="uninstall" Directory="INSTALLFOLDER" />
-        <RemoveFolder Id="MastersignFolder" On="uninstall" Directory="MastersignFolder" />
+
         <RemoveFolder Id="ProgramMenuDir" On="uninstall" Directory="ProgramMenuDir" />
+        <RemoveFolder Id="VendorFolder" On="uninstall" Directory="VendorFolder" />
+        <RemoveFolder Id="InstallFolder" On="uninstall" Directory="INSTALLFOLDER" />
       </Component>
 
-      <Component Id="DependenciesComponent" Guid="{07D08DCB-1CC1-475A-8551-983CA26D7C9A}">
+      <Component Id="DependenciesComponent" Guid="{73A8727B-9921-4499-B190-9D2A254C3E16}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm">
+          <!-- set entry InstallFolder to store INSTALLFOLDER for update/uninstall -->
           <RegistryValue KeyPath="yes"
-                         Name="InstallDir" Type="string"
+                         Name="InstallFolder" Type="string"
                          Value="[INSTALLFOLDER]" />
         </RegistryKey>
         <?include DependencyFiles.wxi ?>
