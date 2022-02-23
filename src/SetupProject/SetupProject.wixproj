@@ -57,7 +57,7 @@
   </Target>
   <PropertyGroup>
     <PreBuildEvent>call "$(WIX)bin\heat.exe" dir ^
-    "$(SolutionDir)Mastersign.AutoForm\bin\$(ConfigurationName)\netframework461" ^
+    "$(SolutionDir)Mastersign.AutoForm\bin\$(ConfigurationName)\netframework472" ^
     -srd -sreg -ag ^
     -var var.Mastersign.AutoForm.TargetDir ^
     -t "$(ProjectDir)SelectSystemComponents.xslt" ^

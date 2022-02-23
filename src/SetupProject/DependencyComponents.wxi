@@ -34,9 +34,6 @@
   </Component>
 
   <!-- System / Platform -->
-  <Component Id="SystemDependencies" Guid="*">
-    <File Id="NetstandardDLL" KeyPath="yes" Name="netstandard.dll" Source="$(var.Mastersign.AutoForm.TargetDir)netstandard.dll" />
-  </Component>
   <?include SystemComponents.wxi ?>
   
 </Include>
