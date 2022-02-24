@@ -94,44 +94,51 @@
             </Grid>
         </StackPanel>
 
-        <Grid Name="gridRecordControl" Grid.Row="1" Margin="0,0,0,10">
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Name="lblRecordControls" IsEnabled="False" Content="Records:" />
-            <Button Name="btnRecordFirst" Grid.Column="1" Style="{StaticResource NavButton}" 
-                    IsEnabled="False" Click="btnRecordFirst_Click">
-                <mi:MaterialIcon Kind="ChevronLeftFirst" />
-            </Button>
-            <Button Name="btnRecordPrevious" Grid.Column="2" Style="{StaticResource NavButton}"
-                    IsEnabled="False" Click="btnRecordPrevious_Click">
-                <mi:MaterialIcon Kind="ChevronLeft" />
-            </Button>
-            <TextBox Name="lblRecordNumber" Grid.Column="3" IsEnabled="false"
-                     Width="48" Margin="0,0,4,0" VerticalAlignment="Center"/>
-            <Button Name="btnRecordNext"  Grid.Column="4" Style="{StaticResource NavButton}"
-                    IsEnabled="False" Click="btnRecordNext_Click">
-                <mi:MaterialIcon Kind="ChevronRight" />
-            </Button>
-            <Button Name="btnRecordLast"  Grid.Column="5" Style="{StaticResource NavButton}"
-                    IsEnabled="False" Click="btnRecordLast_Click">
-                <mi:MaterialIcon Kind="ChevronRightLast" />
-            </Button>
-            <CheckBox Name="chkOnlyCurrent" Grid.Column="6" IsEnabled="False"
-                      HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0"
-                      Content="Only current" ToolTip="Play script only for the current record, instead of iterating through all."/>
-            <CheckBox Name="chkNoPause" Grid.Column="7" HorizontalAlignment="Right" VerticalAlignment="Center" 
+            <Grid Name="gridRecordControl">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Label Name="lblRecordControls" IsEnabled="False" Content="Records:" />
+                <Button Name="btnRecordFirst" Grid.Column="1" Style="{StaticResource NavButton}" 
+                        IsEnabled="False" Click="btnRecordFirst_Click">
+                    <mi:MaterialIcon Kind="ChevronLeftFirst" />
+                </Button>
+                <Button Name="btnRecordPrevious" Grid.Column="2" Style="{StaticResource NavButton}"
+                        IsEnabled="False" Click="btnRecordPrevious_Click">
+                    <mi:MaterialIcon Kind="ChevronLeft" />
+                </Button>
+                <TextBox Name="lblRecordNumber" Grid.Column="3" IsEnabled="false"
+                         Width="80" Margin="0,0,4,0" VerticalAlignment="Center" TextAlignment="Center"/>
+                <Button Name="btnRecordNext"  Grid.Column="4" Style="{StaticResource NavButton}"
+                        IsEnabled="False" Click="btnRecordNext_Click">
+                    <mi:MaterialIcon Kind="ChevronRight" />
+                </Button>
+                <Button Name="btnRecordLast"  Grid.Column="5" Style="{StaticResource NavButton}"
+                        IsEnabled="False" Click="btnRecordLast_Click">
+                    <mi:MaterialIcon Kind="ChevronRightLast" />
+                </Button>
+                <CheckBox Name="chkOnlyCurrent" Grid.Column="6" IsEnabled="False"
+                          HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0"
+                          Content="Only current" ToolTip="Play script only for the current record, instead of iterating through all."/>
+            </Grid>
+            <CheckBox Name="chkNoPause" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" 
                       Content="No pauses" ToolTip="Skip all Pause actions during playback."/>
         </Grid>
 
-        <TabControl Grid.Row="2">
+
+        <TabControl Name="tabs" Grid.Row="2">
             <TabItem Header="Summary">
                 <Grid Margin="4,6,6,6">
                     <Grid.ColumnDefinitions>
@@ -193,7 +200,7 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="Current Record">
+            <TabItem Name="tabItemRecordPreview"  Header="Current Record">
                 <ListView Name="lstRecords" BorderThickness="0" Margin="0">
                     <ListView.View>
                         <GridView AllowsColumnReorder="False">

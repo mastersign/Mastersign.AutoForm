@@ -82,11 +82,14 @@ namespace Mastersign.AutoForm
             if (Project.Records.Count > 0)
             {
                 lblRecords.Content = Project.Records.Count.ToString();
+                gridRecordControl.Visibility = Visibility.Visible;
                 RecordNumber = 0;
             }
             else
             {
                 lblRecords.Content = "none";
+                gridRecordControl.Visibility= Visibility.Collapsed;
+                RecordNumber = null;
             }
             UpdateRecordUI();
             if (Project.HasErrors)
@@ -96,6 +99,7 @@ namespace Mastersign.AutoForm
             else
             {
                 txtErrors.Text = string.Empty;
+                tabItemRecordPreview.Visibility = Project.Records.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
                 await Runner.Initialize(Project);
             }
             btnReload.IsEnabled = true;
@@ -105,27 +109,25 @@ namespace Mastersign.AutoForm
         {
             if (RecordNumber.HasValue)
             {
-                lblRecordControls.IsEnabled = true;
+                gridRecordControl.IsEnabled = true;
                 var no = RecordNumber.Value;
-                lblRecordNumber.Text = (no + 1).ToString();
+                lblRecordNumber.Text = $"{no + 1} of {Project.Records.Count}";
                 btnRecordFirst.IsEnabled = no > 0;
                 btnRecordPrevious.IsEnabled = no > 0;
                 btnRecordNext.IsEnabled = no < Project.Records.Count - 1;
                 btnRecordLast.IsEnabled = no < Project.Records.Count - 1;
-                chkOnlyCurrent.IsEnabled = true;
                 lstRecords.ItemsSource = Project.RecordColumns
                     .Select(col => new KeyValuePair<string, object>(
                         col, Project.Records[RecordNumber.Value][col].GetValue()));
             }
             else
             {
-                lblRecordControls.IsEnabled = false;
-                lblRecordNumber.Text = string.Empty;
+                gridRecordControl.IsEnabled = false;
+                lblRecordNumber.Text = "—";
                 btnRecordFirst.IsEnabled = false;
                 btnRecordPrevious.IsEnabled = false;
                 btnRecordNext.IsEnabled = false;
                 btnRecordLast.IsEnabled = false;
-                chkOnlyCurrent.IsEnabled = false;
                 lstRecords.ItemsSource = null;
             }
         }
@@ -194,6 +196,7 @@ namespace Mastersign.AutoForm
 
         private async Task<bool> ExecuteActions()
         {
+            if (RecordNumber.HasValue) tabs.SelectedItem = tabItemRecordPreview;
             foreach (var action in Project.Actions)
             {
                 var a = action;

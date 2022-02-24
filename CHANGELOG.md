@@ -21,6 +21,11 @@ Add a link to the GitHub diff like
 * Support for conditional actions
 * Substitution check when loading an Excel file
 
+### Changed
+* Tab _Current Record_ and record navigation controls are hidden,
+  unless the Excel file actually contains records
+* Record navigation controls show number of records like `3 of 12`
+
 ## [1.0.0] - 2022-02-23
 
 [1.0.0]: https://github.com/mastersign/Mastersign.AutoForm/tree/v1.0.0
