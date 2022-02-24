@@ -163,11 +163,12 @@ namespace Mastersign.AutoForm
                 btnChooseExcelFile.IsEnabled = false;
                 btnReload.IsEnabled = false;
                 btnRun.IsEnabled = false;
+                var withoutCancelling = false;
 
                 await Runner.Initialize(Project);
                 if (Project.Records.Count == 0 || chkOnlyCurrent.IsChecked == true)
                 {
-                    await ExecuteActions();
+                    withoutCancelling = await ExecuteActions();
                 }
                 else
                 {
@@ -175,13 +176,21 @@ namespace Mastersign.AutoForm
                     {
                         RecordNumber = i;
                         UpdateRecordUI();
-                        var uninterrupted = await ExecuteActions();
-                        if (!uninterrupted) break;
+                        withoutCancelling = await ExecuteActions();
+                        if (!withoutCancelling) break;
                     }
                 }
-                
-                MessageBox.Show(this, "Automation finished.", "AutoForm Finish",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                if (withoutCancelling)
+                {
+                    MessageBox.Show(this, "Automation finished.", "AutoForm Finish",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show(this, "Automation was cancelled.", "AutoForm Cancelled",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             catch (Exception ex)
             {

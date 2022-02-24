@@ -20,6 +20,9 @@ Add a link to the GitHub diff like
 ### Fixed
 * Checkbox _Only current_ was always disabled
 
+### Changed
+* Messagebox when automation was cancelled
+
 ## [1.1.0] - 2022-02-24
 
 [1.1.0]: https://github.com/mastersign/Mastersign.AutoForm/compare/v1.0.0...v1.1.0
