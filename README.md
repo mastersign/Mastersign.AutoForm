@@ -4,7 +4,7 @@
 
 ## Requirements
 
-* .NET Framework &ge; 7.2.1 (is shipped with Windows since Windows 10 1803)
+* .NET Framework &ge; 4.7.2 (is shipped with Windows since Windows 10 1803)
 * Google Chrome Browser
 
 ## How to install
