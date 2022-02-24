@@ -20,9 +20,9 @@ Download and execute the MSI file from the [release](https://github.com/mastersi
 * Save the template file with the button _Save Template_ in the _AutoForm_ window.
 * Open the template file with _Excel_
 	+ Adapt the _Script_ sheet
-		- Change the name of the script (row 5)
-		- Change the description of the script (row 6)
-		- Specify the size of the visible area in the browser (row 7 and 8)
+		- Change the name of the script `B4`
+		- Change the description of the script `B5`
+		- Specify the size of the visible area in the browser (`B7` and `B8`)
 		- Describe the actions (row 12 and following)
 	+ Put your data records in the _Records_ sheet, or delete the existing template rows there
 		- The first row must contain the column names
@@ -43,6 +43,8 @@ Download and execute the MSI file from the [release](https://github.com/mastersi
   instead of iterating through all records.
 * Use the _No pauses_ checkbox to automatically skip all _Pause_ actions in the script.
 * Suspend individual actions (temporarily) by entering `Skip` in column A.
+* Make actions conditional by using a placeholder `$(...)` in column F (_Condition_).
+  If the condition value is empty, `FALSE`, or `0` the action is skipped.
 
 ## Supported Actions
 
