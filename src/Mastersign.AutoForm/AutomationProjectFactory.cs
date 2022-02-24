@@ -17,7 +17,8 @@ namespace Mastersign.AutoForm
 
             try
             {
-                if (!wb.TryGetWorksheet("Script", out var ws)) {
+                if (!wb.TryGetWorksheet("Script", out var ws))
+                {
                     ap.Errors.Add("Could not find worksheet 'Script'.");
                     return ap;
                 }
@@ -80,6 +81,7 @@ namespace Mastersign.AutoForm
                         var p1Cell = ws.Cell(row, 3);
                         var p2Cell = ws.Cell(row, 4);
                         var p3Cell = ws.Cell(row, 5);
+                        var condCell = ws.Cell(row, 6);
                         switch (actionType)
                         {
                             case null:
@@ -94,6 +96,7 @@ namespace Mastersign.AutoForm
                                         {
                                             Name = fieldName,
                                             Value = fieldValue,
+                                            ConditionExpression = GetCellValue(condCell),
                                         });
                                     }
                                 }
@@ -216,7 +219,11 @@ namespace Mastersign.AutoForm
                             if (skip)
                                 ap.SkippedActions++;
                             else
+                            {
+                                newAction.Row = row;
+                                newAction.ConditionExpression = GetCellValue(condCell);
                                 actions.Add(newAction);
+                            }
                         }
                     }
                 }
@@ -235,14 +242,12 @@ namespace Mastersign.AutoForm
                         for (var row = 2; row <= recordRowLimit; row++)
                         {
                             var empty = true;
-                            var record = new Dictionary<string, string>();
+                            var record = new Record();
                             foreach (var col in columNames.Keys)
                             {
-                                var recordCell = wsRecords.Cell(row, col);
-                                if (recordCell.IsEmpty()) continue;
-                                empty = false;
-                                var value = recordCell.GetValue<string>();
-                                record[columNames[col]] = value;
+                                var recordValue = GetCellValue(wsRecords.Cell(row, col));
+                                if (!recordValue.IsEmpty) empty = false;
+                                record[columNames[col]] = recordValue;
                             }
                             if (!empty)
                             {
@@ -262,6 +267,24 @@ namespace Mastersign.AutoForm
                 wbs.Dispose();
             }
             return ap;
+        }
+
+        private static CellValue GetCellValue(ClosedXML.Excel.IXLCell cell)
+        {
+            var cellValue = new CellValue();
+            if (!cell.IsEmpty())
+            {
+                if (cell.DataType == ClosedXML.Excel.XLDataType.Boolean)
+                {
+                    cellValue.BooleanValue = cell.GetBoolean();
+                }
+                else if (cell.DataType == ClosedXML.Excel.XLDataType.Number)
+                {
+                    cellValue.NumericValue = cell.GetDouble();
+                }
+                cellValue.StringValue = cell.GetString();
+            }
+            return cellValue;
         }
     }
 }

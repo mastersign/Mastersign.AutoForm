@@ -20,7 +20,7 @@ namespace Mastersign.AutoForm
 
         public List<string> RecordColumns { get; set; } = new List<string>();
 
-        public List<Dictionary<string, string>> Records { get; set; } = new List<Dictionary<string, string>>();
+        public List<Record> Records { get; set; } = new List<Record>();
 
         public int SkippedActions { get; set; }
 
@@ -38,12 +38,13 @@ namespace Mastersign.AutoForm
 
         public override string ToString() =>
             "Automation Project" +
-            $"\n\tName:            {Name}" +
-            $"\n\tDescription:     {Description}" +
-            $"\n\tActions:         {Actions.Count}" +
-            $"\n\tSkipped Actions: {SkippedActions}" +
-            $"\n\tRecords:         {Records.Count}" +
-            $"\n\tRecord Columns:   {RecordColumns.Count}" +
+            $"\n\tName:                {Name}" +
+            $"\n\tDescription:         {Description}" +
+            $"\n\tActions:             {Actions.Count}" +
+            $"\n\tSkipped Actions:     {SkippedActions}" +
+            $"\n\tConditional Actions: {Actions.Where(a => a.HasCondition).Count()}" +
+            $"\n\tRecords:             {Records.Count}" +
+            $"\n\tRecord Columns:      {RecordColumns.Count}" +
             $"\nRecord Schema: {RecordSchemaString}" +
             $"\nErrors: {ErrorString}" +
             $"\n\n{ActionListString}";
@@ -51,15 +52,93 @@ namespace Mastersign.AutoForm
 
     abstract class Action
     {
-        public virtual Action Substitute(Dictionary<string, string> record) => (Action)MemberwiseClone();
+        public int Row { get; set; }
 
+        public CellValue ConditionExpression { get; set; }
+
+        public bool HasCondition => ConditionExpression != null && !ConditionExpression.IsEmptyOrWhitespace;
+
+        public bool DeactivatedByCondition { get; set; }
+
+        public virtual Action Substitute(Record record)
+        {
+            var result = (Action)MemberwiseClone();
+            if (HasCondition)
+            {
+                result.DeactivatedByCondition = !EvaluateCondition(ConditionExpression, record);
+            }
+            return result;
+        }
+        
         static readonly Regex placeholderPattern = new Regex(@"\$\((?<name>[^\)]+)\)");
 
-        protected static string Substitute(string s, Dictionary<string, string> record)
+        protected static string Substitute(string s, Record record)
             => placeholderPattern.Replace(s,
                 m => record.TryGetValue(m.Groups["name"].Value, out var value)
-                    ? value
-                    : $"?({m.Groups["name"].Value})");
+                    ? value.StringValue
+                    : throw new SubstitutionException(s, m.Groups["name"].Value));
+
+        static readonly Regex simpleConditionPattern = new Regex(@"^\$\((?<name>[^\)]+)\)$");
+
+        static readonly Regex falseConditionPattern = new Regex(@"^\s*(?:false|no|falsch|nein|0+([.,]0*)?|[.,]0+)?\s*$", RegexOptions.IgnoreCase);
+
+        protected static bool EvaluateCondition(CellValue condExpr, Record record)
+        {
+            if (condExpr.BooleanValue.HasValue)
+            {
+                if (condExpr.BooleanValue == false) return false;
+            }
+            else if (condExpr.NumericValue.HasValue)
+            {
+                if (condExpr.NumericValue == 0) return false;
+            }
+            else
+            {
+                var simpleMatch = simpleConditionPattern.Match(condExpr.StringValue);
+                if (simpleMatch.Success)
+                {
+                    var columnName = simpleMatch.Groups["name"].Value;
+                    if (record.TryGetValue(columnName, out var cellValue))
+                    {
+                        if (cellValue.BooleanValue.HasValue && cellValue.BooleanValue == false ||
+                            cellValue.NumericValue.HasValue && cellValue.NumericValue == 0 ||
+                            cellValue.IsEmptyOrWhitespace)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                        throw new SubstitutionException(condExpr.StringValue, columnName);
+                }
+                else
+                {
+                    var substitutedCondition = Substitute(condExpr.StringValue, record);
+                    if (falseConditionPattern.IsMatch(substitutedCondition))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+    
+    [Serializable]
+    public class SubstitutionException : Exception
+    {
+        public string Expression { get; }
+        public string ColumnName { get; }
+
+        public SubstitutionException(string expression, string columnName)
+            : base($"Column name '{columnName}' from expression '{expression}' not found.")
+        {
+            Expression = expression;
+            ColumnName = columnName;
+        }
+
+        protected SubstitutionException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     class PauseAction : Action
@@ -68,7 +147,7 @@ namespace Mastersign.AutoForm
 
         public override string ToString() => $"Pause: {Label}";
 
-        public override Action Substitute(Dictionary<string, string> record)
+        public override Action Substitute(Record record)
         {
             var result = (PauseAction)base.Substitute(record);
             result.Label = Substitute(Label, record);
@@ -84,7 +163,7 @@ namespace Mastersign.AutoForm
 
         public override string ToString() => $"Navigate: {Url}";
 
-        public override Action Substitute(Dictionary<string, string> record)
+        public override Action Substitute(Record record)
         {
             var result = (NavigateAction)base.Substitute(record);
             result.Url = Substitute(Url, record);
@@ -105,7 +184,7 @@ namespace Mastersign.AutoForm
 
         public int Timeout { get; set; } = 500;
 
-        public override Action Substitute(Dictionary<string, string> record)
+        public override Action Substitute(Record record)
         {
             var result = (TargetedAction)base.Substitute(record);
             result.Selector = Substitute(Selector, record);
@@ -119,7 +198,7 @@ namespace Mastersign.AutoForm
 
         public override string ToString() => $"CheckText: {Selector} for '{Text}' (Timeout = {Timeout}ms)";
 
-        public override Action Substitute(Dictionary<string, string> record)
+        public override Action Substitute(Record record)
         {
             var result = (CheckTextAction)base.Substitute(record);
             result.Text = Substitute(Text, record);
@@ -145,7 +224,7 @@ namespace Mastersign.AutoForm
 
         public override string ToString() => $"Input: {Selector} (Timeout = {Timeout}ms)";
 
-        public override Action Substitute(Dictionary<string, string> record)
+        public override Action Substitute(Record record)
         {
             var result = (InputAction)base.Substitute(record);
             result.Value = Substitute(Value, record);
@@ -159,13 +238,14 @@ namespace Mastersign.AutoForm
 
         public override string ToString() => $"Form: {Selector} (Timeout = {Timeout}ms)\n\t{string.Join("\n\t", Inputs)}";
 
-        public override Action Substitute(Dictionary<string, string> record)
+        public override Action Substitute(Record record)
         {
             var result = (FormAction)base.Substitute(record);
             result.Inputs = Inputs.Select(f => new FormField
             {
                 Name = Substitute(f.Name, record),
                 Value = Substitute(f.Value, record),
+                DeactivatedByCondition = f.HasCondition && !EvaluateCondition(f.ConditionExpression, record),
             }).ToList();
             return result;
         }
@@ -173,10 +253,37 @@ namespace Mastersign.AutoForm
 
     class FormField
     {
+        public CellValue ConditionExpression { get; set; }
+
+        public bool HasCondition => ConditionExpression != null && !ConditionExpression.IsEmptyOrWhitespace;
+
+        public bool DeactivatedByCondition { get; set; }
+
         public string Name { get; set; }
 
         public string Value { set; get; }
 
         public override string ToString() => $"Set: {Name} = \"{Value}\"";
+    }
+
+    class Record : Dictionary<string, CellValue> 
+    {
+    }
+
+    class CellValue
+    {
+        public string StringValue { get; set; }
+
+        public bool? BooleanValue { get; set; }
+
+        public double? NumericValue { get; set; }
+
+        public bool IsEmpty => !BooleanValue.HasValue && !NumericValue.HasValue && string.IsNullOrEmpty(StringValue);
+
+        public bool IsEmptyOrWhitespace => IsEmpty || string.IsNullOrWhiteSpace(StringValue);
+
+        public override string ToString() => StringValue;
+
+        public object GetValue() => BooleanValue ?? NumericValue ?? (object)StringValue;
     }
 }

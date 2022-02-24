@@ -17,6 +17,9 @@ Add a link to the GitHub diff like
 
 [Unreleased]: https://github.com/mastersign/Mastersign.AutoForm/compare/main...dev
 
+### Added
+* Support for conditional actions
+
 ## [1.0.0] - 2022-02-23
 
 [1.0.0]: https://github.com/mastersign/Mastersign.AutoForm/tree/v1.0.0

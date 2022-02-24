@@ -114,8 +114,8 @@ namespace Mastersign.AutoForm
                 btnRecordLast.IsEnabled = no < Project.Records.Count - 1;
                 chkOnlyCurrent.IsEnabled = true;
                 lstRecords.ItemsSource = Project.RecordColumns
-                    .Select(col => new KeyValuePair<string, string>(
-                        col, Project.Records[RecordNumber.Value][col]));
+                    .Select(col => new KeyValuePair<string, object>(
+                        col, Project.Records[RecordNumber.Value][col].GetValue()));
             }
             else
             {
@@ -196,9 +196,29 @@ namespace Mastersign.AutoForm
         {
             foreach (var action in Project.Actions)
             {
-                var a = RecordNumber.HasValue
-                    ? action.Substitute(Project.Records[RecordNumber.Value])
-                    : action;
+                var a = action;
+                if (RecordNumber.HasValue)
+                {
+                    var record = Project.Records[RecordNumber.Value];
+                    try
+                    {
+                        a = a.Substitute(record);
+                    }
+                    catch(SubstitutionException e)
+                    {
+                        var result = MessageBox.Show(this,
+                            "Substitution failed: " + e.Message + "\n\n" +
+                            "If you press OK, the current record is skipped." +
+                            "Otherwise the execution is canceled.",
+                            "AutoForm Substitution Error",
+                            MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                        if (result == MessageBoxResult.OK)
+                            continue;
+                        else
+                            return false;
+                    }
+                }
+                if (a.DeactivatedByCondition) continue;
                 if (a is PauseAction pauseAction)
                 {
                     if (chkNoPause.IsChecked == true) continue;

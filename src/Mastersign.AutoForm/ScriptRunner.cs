@@ -241,6 +241,7 @@ namespace Mastersign.AutoForm
 
             foreach (var f in a.Inputs)
             {
+                if (f.DeactivatedByCondition) continue;
                 var elements = await form.QuerySelectorAllAsync(string.Join(", ", new[] {
                     $"input[name='{f.Name}']",
                     $"textarea[name='{f.Name}']",
