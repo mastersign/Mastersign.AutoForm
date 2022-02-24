@@ -2,11 +2,6 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <!--
-  Important: To create an upgrade package,
-             increase the Product/@Version attribute
-             and generate a new value for Product/@Id!
-  -->
   <Product Id="*"
            Name="Mastersign AutoForm"
            Manufacturer="Tobias Kiertscher"
