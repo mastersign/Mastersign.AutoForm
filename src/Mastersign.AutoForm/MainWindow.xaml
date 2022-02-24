@@ -129,14 +129,13 @@
                         IsEnabled="False" Click="btnRecordLast_Click">
                     <mi:MaterialIcon Kind="ChevronRightLast" />
                 </Button>
-                <CheckBox Name="chkOnlyCurrent" Grid.Column="6" IsEnabled="False"
+                <CheckBox Name="chkOnlyCurrent" Grid.Column="6"
                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0"
                           Content="Only current" ToolTip="Play script only for the current record, instead of iterating through all."/>
             </Grid>
             <CheckBox Name="chkNoPause" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" 
                       Content="No pauses" ToolTip="Skip all Pause actions during playback."/>
         </Grid>
-
 
         <TabControl Name="tabs" Grid.Row="2">
             <TabItem Header="Summary">

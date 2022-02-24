@@ -116,6 +116,7 @@ namespace Mastersign.AutoForm
                 btnRecordPrevious.IsEnabled = no > 0;
                 btnRecordNext.IsEnabled = no < Project.Records.Count - 1;
                 btnRecordLast.IsEnabled = no < Project.Records.Count - 1;
+                chkOnlyCurrent.IsEnabled = true;
                 lstRecords.ItemsSource = Project.RecordColumns
                     .Select(col => new KeyValuePair<string, object>(
                         col, Project.Records[RecordNumber.Value][col].GetValue()));
@@ -128,6 +129,7 @@ namespace Mastersign.AutoForm
                 btnRecordPrevious.IsEnabled = false;
                 btnRecordNext.IsEnabled = false;
                 btnRecordLast.IsEnabled = false;
+                chkOnlyCurrent.IsEnabled = false;
                 lstRecords.ItemsSource = null;
             }
         }
