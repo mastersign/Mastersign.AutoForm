@@ -19,6 +19,7 @@ Add a link to the GitHub diff like
 
 ### Added
 * Support for conditional actions
+* Substitution check when loading an Excel file
 
 ## [1.0.0] - 2022-02-23
 

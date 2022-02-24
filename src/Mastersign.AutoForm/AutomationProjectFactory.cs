@@ -256,6 +256,23 @@ namespace Mastersign.AutoForm
                         }
                     }
                 }
+
+                // check for substitution errors
+                if (ap.Records.Count > 0)
+                {
+                    var record = ap.Records.First();
+                    foreach (var action in ap.Actions)
+                    {
+                        try
+                        {
+                            action.Substitute(record);
+                        }
+                        catch(SubstitutionException e)
+                        {
+                            ap.Errors.Add($"Row {action.Row}: {e.Message}");
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
