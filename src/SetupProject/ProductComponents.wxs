@@ -1,0 +1,40 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+      <Component Id="ProductComponent" Guid="{053B35E0-8F38-4B4B-A03A-3AC2C95859E0}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm">
+          <RegistryValue KeyPath="yes"
+                         Name="MainExe" Type="string"
+                         Value="[INSTALLFOLDER]$(var.Mastersign.AutoForm.TargetFileName)" />
+        </RegistryKey>
+
+        <File Id="MainEXE" KeyPath="no"
+              Source="$(var.Mastersign.AutoForm.TargetPath)">
+          <Shortcut Id="startmenuMainProgram"
+                    Directory="ProgramMenuDir" Name="AutoForm"
+                    WorkingDirectory="INSTALLFOLDER" Icon="AutoForm.ico" IconIndex="0" />
+        </File>
+
+        <File Id="MainCONFIG"
+              Source="$(var.Mastersign.AutoForm.TargetPath).config" />
+
+        <RemoveFolder Id="ProgramMenuDir" On="uninstall" Directory="ProgramMenuDir" />
+        <RemoveFolder Id="VendorFolder" On="uninstall" Directory="VendorFolder" />
+        <RemoveFolder Id="InstallFolder" On="uninstall" Directory="INSTALLFOLDER" />
+      </Component>
+
+      <Component Id="InstallFolderComponent" Guid="{73A8727B-9921-4499-B190-9D2A254C3E16}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm">
+          <!-- set entry InstallFolder to store INSTALLFOLDER for update/uninstall -->
+          <RegistryValue KeyPath="yes"
+                         Name="InstallFolder" Type="string"
+                         Value="[INSTALLFOLDER]" />
+        </RegistryKey>
+      </Component>
+
+      <ComponentGroupRef Id="ProductDependencyComponents"/>
+      
+    </ComponentGroup>
+  </Fragment>
+</Wix>

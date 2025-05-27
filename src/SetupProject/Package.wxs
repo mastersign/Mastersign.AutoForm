@@ -1,0 +1,42 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package 
+      Id="Mastersign.AutoForm"
+      Name="AutoForm"
+      Manufacturer="Mastersign"
+      Version="1.1.1.0"
+      Language="1033"
+      Scope="perUser"
+      UpgradeCode="{73A23A01-93DF-4500-A004-E9C12329B266}">
+    
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+    
+    <MediaTemplate EmbedCab="true" />
+
+    <!-- Product Icon -->
+    <Icon Id="AutoForm.ico" SourceFile="$(var.Mastersign.AutoForm.ProjectDir)\Icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AutoForm.ico" />
+
+    <!-- UI Resources -->
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)..\LICENSE.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="Banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Dialog.bmp" />
+
+    <!-- Retrieve INSTALLFOLDER from previous install -->
+    <Property Id="INSTALLFOLDER">
+      <RegistrySearch Id="GetPreviousInstallFolder"
+                      Root="HKCU" Key="Software\Mastersign\AutoForm" Name="InstallFolder" Type="raw" />
+    </Property>
+
+    <!-- Setup UI -->
+    <ui:WixUI
+      Id="WixUI_InstallDir"
+      InstallDirectory="INSTALLFOLDER" />
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  
+  </Package>
+</Wix>

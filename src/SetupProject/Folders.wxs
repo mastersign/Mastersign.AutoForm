@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <!--
+    When installing in scope perMachine, you may use ProgramFiles6432Folder,
+    to automatically choose install root by OS arch for AnyCPU assemblies
+    -->
+    <StandardDirectory Id="AppDataFolder">
+      <Directory Id="VendorFolder" Name="Mastersign">
+        <Directory Id="INSTALLFOLDER" Name="AutoForm" />
+      </Directory>
+    </StandardDirectory>
+    
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuDir" Name="Mastersign AutoForm" />
+    </StandardDirectory>
+
+  </Fragment>
+</Wix>
