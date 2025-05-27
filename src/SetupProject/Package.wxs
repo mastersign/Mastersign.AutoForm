@@ -5,7 +5,7 @@
       Id="Mastersign.AutoForm"
       Name="AutoForm"
       Manufacturer="Mastersign"
-      Version="1.1.1.0"
+      Version="1.2.0.0"
       Language="1033"
       Scope="perUser"
       UpgradeCode="{73A23A01-93DF-4500-A004-E9C12329B266}">
