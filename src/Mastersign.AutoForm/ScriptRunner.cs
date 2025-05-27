@@ -98,11 +98,22 @@ namespace Mastersign.AutoForm
                 });
                 browser.Closed += (o, e) => browser = null;
             }
-            page = await browser.NewPageAsync();
-            var pages = await browser.PagesAsync();
-            foreach (var p in pages)
+            if (project != null && project.CleanBrowser)
             {
-                if (p != page) await p.CloseAsync();
+                page = await browser.NewPageAsync();
+                var pages = await browser.PagesAsync();
+                foreach (var p in pages)
+                {
+                    if (p != page) await p.CloseAsync();
+                }
+            }
+            else
+            {
+                page = (await browser.PagesAsync()).FirstOrDefault();
+                if (page == null)
+                {
+                    page = await browser.NewPageAsync();
+                }
             }
             if (project != null)
             {

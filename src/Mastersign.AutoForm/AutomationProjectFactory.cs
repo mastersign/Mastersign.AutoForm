@@ -63,6 +63,15 @@ namespace Mastersign.AutoForm
                             else
                                 ap.ViewportHeight = null;
                             break;
+                        case "clean":
+                        case "clean browser":
+                            actions = null;
+                            var cleanCell = ws.Cell(row, 2);
+                            if (cleanCell.TryGetValue(out bool cleanBrowser))
+                                ap.CleanBrowser = cleanBrowser;
+                            else
+                                ap.CleanBrowser = true;
+                            break;
                         case "actions":
                             actions = ap.Actions;
                             break;

@@ -13,6 +13,7 @@ namespace Mastersign.AutoForm
         public string Description { get; set; }
         public int? ViewportWidth { get; set; }
         public int? ViewportHeight { get; set; }
+        public bool CleanBrowser { get; set; } = true;
 
         public List<string> Errors { get; set; } = new List<string>();
 
@@ -40,7 +41,7 @@ namespace Mastersign.AutoForm
             "Automation Project" +
             $"\n\tName:                {Name}" +
             $"\n\tDescription:         {Description}" +
-            $"\n\tActions:             {Actions.Count}" +
+            $"\n\tClean Browser:       {(CleanBrowser ? "Yes" : "No")}" +
             $"\n\tSkipped Actions:     {SkippedActions}" +
             $"\n\tConditional Actions: {Actions.Where(a => a.HasCondition).Count()}" +
             $"\n\tRecords:             {Records.Count}" +
