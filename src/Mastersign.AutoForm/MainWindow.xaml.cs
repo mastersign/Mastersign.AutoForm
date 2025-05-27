@@ -77,7 +77,7 @@ namespace Mastersign.AutoForm
             var viewportWidth = Project.ViewportWidth.HasValue ? Project.ViewportWidth.ToString() : "auto";
             var viewportHeight = Project.ViewportHeight.HasValue ? Project.ViewportHeight.ToString() : "auto";
             lblViewport.Content = $"{viewportWidth} ⨉ {viewportHeight} px";
-            lblActions.Content = Project.Actions.Count.ToString();
+            lblActions.Content = Project.PreActions.Count + " / " + Project.LoopActions.Count + " / " + Project.PostActions.Count;
             lblSkippedActions.Content = Project.SkippedActions.ToString();
             if (Project.Records.Count > 0)
             {
@@ -156,7 +156,7 @@ namespace Mastersign.AutoForm
 
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            if (Project == null || Project.HasErrors || Project.Actions.Count == 0) return;
+            if (Project == null || Project.HasErrors || Project.LoopActions.Count == 0) return;
 
             try
             {
@@ -168,16 +168,27 @@ namespace Mastersign.AutoForm
                 await Runner.Initialize(Project);
                 if (Project.Records.Count == 0 || chkOnlyCurrent.IsChecked == true)
                 {
-                    withoutCancelling = await ExecuteActions();
+                    withoutCancelling = 
+                        await ExecutePreActions()
+                        && await ExecuteLoopActions()
+                        && await ExecutePostActions();
                 }
                 else
                 {
-                    for (var i = 0; i < Project.Records.Count; i++)
+                    withoutCancelling = await ExecutePreActions();
+                    if (withoutCancelling)
                     {
-                        RecordNumber = i;
-                        UpdateRecordUI();
-                        withoutCancelling = await ExecuteActions();
-                        if (!withoutCancelling) break;
+                        for (var i = 0; i < Project.Records.Count; i++)
+                        {
+                            RecordNumber = i;
+                            UpdateRecordUI();
+                            withoutCancelling = await ExecuteLoopActions();
+                            if (!withoutCancelling) break;
+                        }
+                    }
+                    if (withoutCancelling)
+                    {
+                        withoutCancelling = await ExecutePostActions();
                     }
                 }
 
@@ -205,47 +216,75 @@ namespace Mastersign.AutoForm
             }
         }
 
-        private async Task<bool> ExecuteActions()
+        private async Task<bool> ExecutePreActions()
         {
-            if (RecordNumber.HasValue) tabs.SelectedItem = tabItemRecordPreview;
-            foreach (var action in Project.Actions)
+            foreach (var action in Project.PreActions)
             {
-                var a = action;
-                if (RecordNumber.HasValue)
-                {
-                    var record = Project.Records[RecordNumber.Value];
-                    try
-                    {
-                        a = a.Substitute(record);
-                    }
-                    catch(SubstitutionException e)
-                    {
-                        var result = MessageBox.Show(this,
-                            "Substitution failed: " + e.Message + "\n\n" +
-                            "If you press OK, the current record is skipped." +
-                            "Otherwise the execution is canceled.",
-                            "AutoForm Substitution Error",
-                            MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                        if (result == MessageBoxResult.OK)
-                            continue;
-                        else
-                            return false;
-                    }
-                }
-                if (a.DeactivatedByCondition) continue;
-                if (a is PauseAction pauseAction)
-                {
-                    if (chkNoPause.IsChecked == true) continue;
-                    var result = MessageBox.Show(this, pauseAction.Label, "AutoForm Pause",
-                        MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                    if (result == MessageBoxResult.Cancel) return false;
-                }
-                else
-                {
-                    await Runner.Run(a);
-                }
+                if (!await ExecuteAction(action)) return false;
             }
             return true;
+        }
+
+        private async Task<bool> ExecuteLoopActions()
+        {
+            if (RecordNumber.HasValue) tabs.SelectedItem = tabItemRecordPreview;
+            foreach (var action in Project.LoopActions)
+            {
+                if (!await ExecuteLoopAction(action)) return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> ExecutePostActions()
+        {
+            foreach (var action in Project.PostActions)
+            {
+                if (!await ExecuteAction(action)) return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> ExecuteAction(Action a)
+        {
+            if (a.DeactivatedByCondition) return true;
+            if (a is PauseAction pauseAction)
+            {
+                if (chkNoPause.IsChecked == true) return true;
+                var result = MessageBox.Show(this, pauseAction.Label, "AutoForm Pause",
+                    MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                if (result == MessageBoxResult.Cancel) return false;
+            }
+            else
+            {
+                await Runner.Run(a);
+            }
+            return true;
+        }
+
+        private async Task<bool> ExecuteLoopAction(Action a)
+        {
+            if (RecordNumber.HasValue)
+            {
+                var record = Project.Records[RecordNumber.Value];
+                try
+                {
+                    a = a.Substitute(record);
+                }
+                catch (SubstitutionException e)
+                {
+                    var result = MessageBox.Show(this,
+                        "Substitution failed: " + e.Message + "\n\n" +
+                        "If you press OK, the current record is skipped." +
+                        "Otherwise the execution is canceled.",
+                        "AutoForm Substitution Error",
+                        MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.OK)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            return await ExecuteAction(a);
         }
 
         private void btnRecordFirst_Click(object sender, RoutedEventArgs e)

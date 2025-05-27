@@ -73,7 +73,13 @@ namespace Mastersign.AutoForm
                                 ap.CleanBrowser = true;
                             break;
                         case "actions":
-                            actions = ap.Actions;
+                            actions = ap.PreActions;
+                            break;
+                        case "begin loop":
+                            actions = ap.LoopActions;
+                            break;
+                        case "end loop":
+                            actions = ap.PostActions;
                             break;
                         case "skip":
                             skip = true;
@@ -277,7 +283,7 @@ namespace Mastersign.AutoForm
                 if (ap.Records.Count > 0)
                 {
                     var record = ap.Records.First();
-                    foreach (var action in ap.Actions)
+                    foreach (var action in ap.LoopActions)
                     {
                         try
                         {

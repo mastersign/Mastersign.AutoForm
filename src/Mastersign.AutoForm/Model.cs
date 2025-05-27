@@ -17,7 +17,9 @@ namespace Mastersign.AutoForm
 
         public List<string> Errors { get; set; } = new List<string>();
 
-        public List<Action> Actions { get; set; } = new List<Action>();
+        public List<Action> PreActions { get; set; } = new List<Action>();
+        public List<Action> LoopActions { get; set; } = new List<Action>();
+        public List<Action> PostActions { get; set; } = new List<Action>();
 
         public List<string> RecordColumns { get; set; } = new List<string>();
 
@@ -31,7 +33,11 @@ namespace Mastersign.AutoForm
             ? Errors.Count + "\n\t- " + string.Join("\n\t- ", Errors)
             : "No Errors";
 
-        private string ActionListString => $"   Actions    \n-------------\n{string.Join("\n", Actions)}";
+        private string PreActionListString => $"-----------------\n   Pre Actions   \n-----------------\n{string.Join("\n", PreActions)}";
+
+        private string LoopActionListString => $"------------------\n   Loop Actions   \n------------------\n{string.Join("\n", LoopActions)}";
+
+        private string PostActionListString => $"------------------\n   Post Actions   \n------------------\n{string.Join("\n", PostActions)}";
 
         private string RecordSchemaString => RecordColumns.Any()
             ? "\n\t- " + string.Join("\n\t- ", RecordColumns)
@@ -42,13 +48,14 @@ namespace Mastersign.AutoForm
             $"\n\tName:                {Name}" +
             $"\n\tDescription:         {Description}" +
             $"\n\tClean Browser:       {(CleanBrowser ? "Yes" : "No")}" +
+            $"\n\tActions:             {PreActions.Count} / {LoopActions.Count} / {PostActions.Count}" +
             $"\n\tSkipped Actions:     {SkippedActions}" +
-            $"\n\tConditional Actions: {Actions.Where(a => a.HasCondition).Count()}" +
+            $"\n\tConditional Actions: {LoopActions.Where(a => a.HasCondition).Count()}" +
             $"\n\tRecords:             {Records.Count}" +
             $"\n\tRecord Columns:      {RecordColumns.Count}" +
             $"\nRecord Schema: {RecordSchemaString}" +
             $"\nErrors: {ErrorString}" +
-            $"\n\n{ActionListString}";
+            $"\n{PreActionListString}\n{LoopActionListString}\n{PostActionListString}";
     }
 
     abstract class Action
