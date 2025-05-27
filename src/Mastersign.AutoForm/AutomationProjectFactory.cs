@@ -138,6 +138,13 @@ namespace Mastersign.AutoForm
                                 else
                                     ap.Errors.Add($"No valid URL for {actionType} action in row {row}");
                                 break;
+                            case "Reload":
+                                currentFormAction = null;
+                                var reloadAction = new ReloadAction();
+                                if (p1Cell.TryGetValue(out int timeout))
+                                    reloadAction.Timeout = timeout;
+                                newAction = reloadAction;
+                                break;
                             case "WaitFor":
                                 currentFormAction = null;
                                 if (p1Cell.TryGetValue(out string waitForSelector) &&

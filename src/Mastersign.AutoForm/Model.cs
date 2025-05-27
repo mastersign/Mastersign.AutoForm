@@ -172,6 +172,13 @@ namespace Mastersign.AutoForm
         }
     }
 
+    class ReloadAction : Action
+    {
+        public int Timeout { get; set; } = 5000;
+
+        public override string ToString() => "Reload";
+    }
+
     class DelayAction : Action
     {
         public int Duration { get; set; } = 1000;

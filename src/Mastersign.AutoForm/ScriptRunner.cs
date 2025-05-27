@@ -136,6 +136,7 @@ namespace Mastersign.AutoForm
             if (action is DelayAction delayAction) return RunDelay(delayAction);
             if (page == null) throw new Exception("Page is closed");
             if (action is NavigateAction navigateAction) return RunNavigate(navigateAction);
+            if (action is ReloadAction reloadAction) return RunReload(reloadAction);
             if (action is WaitForAction waitForAction) return RunWaitFor(waitForAction);
             if (action is ClickAction clickAction) return RunClick(clickAction);
             if (action is CheckTextAction checkTextAction) return RunCheckText(checkTextAction);
@@ -148,6 +149,12 @@ namespace Mastersign.AutoForm
 
         private Task RunNavigate(NavigateAction a)
             => page.GoToAsync(a.Url, a.Timeout, new[] {
+                WaitUntilNavigation.DOMContentLoaded,
+                WaitUntilNavigation.Load,
+            });
+
+        private Task RunReload(ReloadAction a)
+            => page.ReloadAsync(a.Timeout, new[] {
                 WaitUntilNavigation.DOMContentLoaded,
                 WaitUntilNavigation.Load,
             });
