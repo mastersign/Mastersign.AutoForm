@@ -97,6 +97,7 @@ namespace Mastersign.AutoForm
                         var p2Cell = ws.Cell(row, 4);
                         var p3Cell = ws.Cell(row, 5);
                         var condCell = ws.Cell(row, 6);
+                        int timeout;
                         switch (actionType)
                         {
                             case null:
@@ -137,7 +138,7 @@ namespace Mastersign.AutoForm
                                     Uri.TryCreate(uriStr, UriKind.Absolute, out var uri))
                                 {
                                     var navigateAction = new NavigateAction { Url = uri.ToString() };
-                                    if (p2Cell.TryGetValue(out int timeout))
+                                    if (p2Cell.TryGetValue(out timeout))
                                         navigateAction.Timeout = timeout;
                                     newAction = navigateAction;
                                 }
@@ -147,7 +148,7 @@ namespace Mastersign.AutoForm
                             case "Reload":
                                 currentFormAction = null;
                                 var reloadAction = new ReloadAction();
-                                if (p1Cell.TryGetValue(out int timeout))
+                                if (p1Cell.TryGetValue(out timeout))
                                     reloadAction.Timeout = timeout;
                                 newAction = reloadAction;
                                 break;
@@ -159,7 +160,7 @@ namespace Mastersign.AutoForm
                                     var waitForAction = new WaitForAction { Selector = waitForSelector };
                                     if (p2Cell.TryGetValue(out bool visibile))
                                         waitForAction.Visible = visibile;
-                                    if (p3Cell.TryGetValue(out int timeout))
+                                    if (p3Cell.TryGetValue(out timeout))
                                         waitForAction.Timeout = timeout;
                                     newAction = waitForAction;
                                 }
@@ -172,7 +173,7 @@ namespace Mastersign.AutoForm
                                     !string.IsNullOrWhiteSpace(clickSelector))
                                 {
                                     var clickAction = new ClickAction { Selector = clickSelector };
-                                    if (p2Cell.TryGetValue(out int timeout))
+                                    if (p2Cell.TryGetValue(out timeout))
                                         clickAction.Timeout = timeout;
                                     newAction = clickAction;
                                 }
@@ -192,7 +193,7 @@ namespace Mastersign.AutoForm
                                             Selector = checkTextSelector,
                                             Text = checkTextText,
                                         };
-                                        if (p3Cell.TryGetValue(out int timeout))
+                                        if (p3Cell.TryGetValue(out timeout))
                                             checkTextAction.Timeout = timeout;
                                         newAction = checkTextAction;
                                     }
@@ -212,7 +213,7 @@ namespace Mastersign.AutoForm
                                         Selector = inputSelector,
                                         Value = p2Cell.TryGetValue(out string inputValue) ? inputValue : string.Empty,
                                     };
-                                    if (p3Cell.TryGetValue(out int timeout))
+                                    if (p3Cell.TryGetValue(out timeout))
                                         inputAction.Timeout = timeout;
                                     newAction = inputAction;
                                 }
