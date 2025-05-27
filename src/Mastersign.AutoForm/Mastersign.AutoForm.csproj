@@ -22,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.95.4" />
-    <PackageReference Include="Material.Icons" Version="1.0.76" />
-    <PackageReference Include="Material.Icons.WPF" Version="1.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="Material.Icons" Version="1.1.35" />
+    <PackageReference Include="Material.Icons.WPF" Version="1.1.0" />
     <PackageReference Include="PuppeteerSharp" Version="6.2.0" />
   </ItemGroup>
 
