@@ -156,7 +156,10 @@ namespace Mastersign.AutoForm
 
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            if (Project == null || Project.HasErrors || Project.LoopActions.Count == 0) return;
+            if (Project == null || Project.HasErrors) return;
+            if (Project.PreActions.Count == 0 &&
+                Project.LoopActions.Count == 0 &&
+                Project.PostActions.Count == 0) return;
 
             try
             {

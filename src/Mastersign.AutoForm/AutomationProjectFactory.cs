@@ -158,8 +158,8 @@ namespace Mastersign.AutoForm
                                     !string.IsNullOrWhiteSpace(waitForSelector))
                                 {
                                     var waitForAction = new WaitForAction { Selector = waitForSelector };
-                                    if (p2Cell.TryGetValue(out bool visibile))
-                                        waitForAction.Visible = visibile;
+                                    if (p2Cell.TryGetValue(out bool visible))
+                                        waitForAction.Visible = visible;
                                     if (p3Cell.TryGetValue(out timeout))
                                         waitForAction.Timeout = timeout;
                                     newAction = waitForAction;
