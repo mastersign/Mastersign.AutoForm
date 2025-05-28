@@ -1,9 +1,24 @@
 $binDir = Resolve-Path "$PSScriptRoot\..\Mastersign.AutoForm\bin\Release\netframework472"
-
+$sourceBase = "`$(var.Mastersign.AutoForm.TargetDir)"
 $include = @("*.dll")
 $exclude = @("AutoForm.*")
+$trgFile = "$PSScriptRoot\ProductDependencies.wxs"
 
-$files = Get-ChildItem -Path $binDir -Recurse -Depth 0 -Include $include -Exclude $exclude
+$existingGuids = @{}
+if (Test-Path $trgFile) {
+    [xml]$wxs = Get-Content $trgFile
+    $group = $wxs.Wix.Fragment.ComponentGroup
+    $group.Component | ForEach-Object {
+        [string]$filename = $_.File.Source
+        if ($filename.StartsWith($sourceBase)) {
+            $filename = $filename.Substring($sourceBase.Length)
+        }
+        $existingGuids[$filename] = $_.Guid
+    }
+}
+
+$files = Get-ChildItem -Path $binDir -Recurse -Depth 0 -Include $include -Exclude $exclude `
+    | Sort-Object -Property FullName
 
 $begin = @"
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -21,7 +36,11 @@ $end = @"
 $components = @()
 
 foreach ($file in $files) {
-    $guid = [Guid]::NewGuid().ToString("B")
+    $guid = if ($existingGuids.ContainsKey($file.Name)) {
+        $existingGuids[$file.Name]
+    } else {
+        [Guid]::NewGuid().ToString("B")
+    }
     $id = [IO.Path]::GetFileNameWithoutExtension($file.Name).Replace(".", "_")
 
     $components += @"
@@ -37,4 +56,4 @@ foreach ($file in $files) {
 }
 
 $xml = $begin + [string]::Join("`r`n", $components) + $end
-$xml | Out-File "$PSScriptRoot\ProductDependencies.wxs" -Encoding utf8
+$xml | Out-File $trgFile -Encoding utf8
