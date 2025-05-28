@@ -11,8 +11,8 @@ namespace Mastersign.AutoForm
 {
     internal class ScriptRunner : IDisposable
     {
-        Browser browser;
-        Page page;
+        IBrowser browser;
+        IPage page;
 
         public bool IsReady => page != null && !page.IsClosed;
 
@@ -30,37 +30,9 @@ namespace Mastersign.AutoForm
             yield return Environment.ExpandEnvironmentVariables(@"%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe");
         }
 
-        //public IEnumerable<string> GetPotentialExecutablePathForFirefox()
-        //{
-        //    var userAppPath = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe", "", null) as string;
-        //    if (userAppPath != null) yield return userAppPath;
-        //    var userVersion = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox", "CurrentVersion", null) as string;
-        //    if (userVersion != null)
-        //    {
-        //        var userLocation = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox\" + userVersion, "PathToExe", null) as string;
-        //        if (userLocation != null) yield return userLocation;
-        //    }
-        //    var machineVersion = Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Mozilla\Mozilla Firefox", "CurrentVersion", null) as string;
-        //    if (machineVersion != null)
-        //    {
-        //        var machineLocation = Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Mozilla\Mozilla Firefox\" + machineVersion, "PathToExe", null) as string;
-        //        if (machineLocation != null) yield return machineLocation;
-        //    }
-        //    yield return Environment.ExpandEnvironmentVariables(@"%ProgramFiles%\Mozilla Firefox\firefox.exe");
-        //    yield return Environment.ExpandEnvironmentVariables(@"%ProgramFiles(x86)%\Mozilla Firefox\firefox.exe");
-        //}
-
-        public string FindExecutable(Product product)
+        public string FindExecutable()
         {
-            switch (product)
-            {
-                case Product.Chrome:
-                    return GetPotentialExecutablePathsForChrome().FirstOrDefault(p => File.Exists(p));
-                //case Product.Firefox:
-                //    return GetPotentialExecutablePathForFirefox().FirstOrDefault(p => File.Exists(p));
-                default:
-                    throw new NotSupportedException();
-            }
+            return GetPotentialExecutablePathsForChrome().FirstOrDefault(p => File.Exists(p));
         }
 
         public async Task Initialize(AutomationProject project)
@@ -72,19 +44,12 @@ namespace Mastersign.AutoForm
 
             if (browser == null)
             {
-                // select browser, prioritize Chrome
-                var chromePath = FindExecutable(Product.Chrome);
-                //var firefoxPath = FindExecutable(Product.Firefox);
-                //var product = chromePath == null && firefoxPath != null ? Product.Firefox : Product.Chrome;
-                var executablePath = chromePath;
-                //if (product == Product.Firefox) executablePath = firefoxPath;
-                if (executablePath == null) throw new NotSupportedException("Google Chrome is not installed.");
-
+                var chromePath = FindExecutable();
+                var executablePath = chromePath
+                    ?? throw new NotSupportedException("Google Chrome is not installed.");
                 browser = await Puppeteer.LaunchAsync(new LaunchOptions
                 {
                     Headless = false,
-                    //Product = product,
-                    Product = Product.Chrome,
                     ExecutablePath = executablePath,
                     DefaultViewport = new ViewPortOptions
                     {
@@ -192,7 +157,7 @@ namespace Mastersign.AutoForm
             }
         }
 
-        private async Task SetInputValue(ElementHandle e, string value)
+        private async Task SetInputValue(IElementHandle e, string value)
         {
 
             if (await e.EvaluateFunctionAsync<bool>("e => e.disabled")) return;
@@ -271,7 +236,7 @@ namespace Mastersign.AutoForm
                 else
                 {
                     var isRadio = true;
-                    ElementHandle radioElement = null;
+                    IElementHandle radioElement = null;
                     foreach (var e in elements)
                     {
                         if ((await e.EvaluateFunctionAsync<string>("e => e.type")) != "radio")
