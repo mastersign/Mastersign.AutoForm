@@ -26,6 +26,7 @@ namespace Mastersign.AutoForm
         private AutomationProject Project { get; set; }
 
         private ScriptRunner Runner { get; }
+        private bool IsIncapable { get; set; }
         private int? RecordNumber { get; set; }
 
         public MainWindow()
@@ -37,8 +38,16 @@ namespace Mastersign.AutoForm
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await Runner.Initialize(null);
-            tBrowserWarning.Visibility = Runner.IsReady ? Visibility.Collapsed : Visibility.Visible;
+            try
+            {
+                await Runner.Initialize(null);
+                IsIncapable = !Runner.IsReady;
+            }
+            catch (NotSupportedException)
+            {
+                IsIncapable = true;
+            }
+            tBrowserWarning.Visibility = IsIncapable ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
@@ -69,7 +78,7 @@ namespace Mastersign.AutoForm
             Project = factory.ParseExcelFile(filename);
             tLog.Text = Project.ToString();
             tLog.Foreground = Project.HasErrors ? Brushes.Maroon : SystemColors.ControlTextBrush;
-            btnRun.IsEnabled = !Project.HasErrors;
+            btnRun.IsEnabled = !Project.HasErrors && !IsIncapable;
             iconOK.Visibility = Project.HasErrors ? Visibility.Hidden : Visibility.Visible;
             iconError.Visibility = Project.HasErrors ? Visibility.Visible : Visibility.Hidden;
             lblProjectName.Content = Project.Name;
@@ -88,7 +97,7 @@ namespace Mastersign.AutoForm
             else
             {
                 lblRecords.Content = "none";
-                gridRecordControl.Visibility= Visibility.Collapsed;
+                gridRecordControl.Visibility = Visibility.Collapsed;
                 RecordNumber = null;
             }
             UpdateRecordUI();
@@ -171,7 +180,7 @@ namespace Mastersign.AutoForm
                 await Runner.Initialize(Project);
                 if (Project.Records.Count == 0 || chkOnlyCurrent.IsChecked == true)
                 {
-                    withoutCancelling = 
+                    withoutCancelling =
                         await ExecutePreActions()
                         && await ExecuteLoopActions()
                         && await ExecutePostActions();
