@@ -41,14 +41,6 @@
         <File Id="Dependency_ExcelNumberFormat_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)ExcelNumberFormat.dll" />
       </Component>
-      <Component Id="Dependency_ICSharpCode_SharpZipLib" Guid="{f044d742-c2fe-4b89-aa68-487b2dfb7e76}">
-        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
-          <RegistryValue KeyPath="yes"
-                         Name="ICSharpCode_SharpZipLib_Component" Type="integer" Value="1" />
-        </RegistryKey>
-        <File Id="Dependency_ICSharpCode_SharpZipLib_FILE"
-              Source="$(var.Mastersign.AutoForm.TargetDir)ICSharpCode.SharpZipLib.dll" />
-      </Component>
       <Component Id="Dependency_Material_Icons" Guid="{5ccfe3de-cb9a-4ba6-8ed4-6731e81be8c0}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
           <RegistryValue KeyPath="yes"
@@ -64,14 +56,6 @@
         </RegistryKey>
         <File Id="Dependency_Material_Icons_WPF_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)Material.Icons.WPF.dll" />
-      </Component>
-      <Component Id="Dependency_Microsoft_AspNetCore_WebUtilities" Guid="{98047d05-6040-4774-8194-3a5610b72e5a}">
-        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
-          <RegistryValue KeyPath="yes"
-                         Name="Microsoft_AspNetCore_WebUtilities_Component" Type="integer" Value="1" />
-        </RegistryKey>
-        <File Id="Dependency_Microsoft_AspNetCore_WebUtilities_FILE"
-              Source="$(var.Mastersign.AutoForm.TargetDir)Microsoft.AspNetCore.WebUtilities.dll" />
       </Component>
       <Component Id="Dependency_Microsoft_Bcl_AsyncInterfaces" Guid="{95f50f78-78f8-4fb2-8cee-18338ff01317}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
@@ -96,6 +80,14 @@
         </RegistryKey>
         <File Id="Dependency_Microsoft_Extensions_DependencyInjection_Abstractions_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+      </Component>
+      <Component Id="Dependency_Microsoft_Extensions_DependencyInjection" Guid="{7c77bb7c-a575-42a9-9425-871bdb3094d7}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
+          <RegistryValue KeyPath="yes"
+                         Name="Microsoft_Extensions_DependencyInjection_Component" Type="integer" Value="1" />
+        </RegistryKey>
+        <File Id="Dependency_Microsoft_Extensions_DependencyInjection_FILE"
+              Source="$(var.Mastersign.AutoForm.TargetDir)Microsoft.Extensions.DependencyInjection.dll" />
       </Component>
       <Component Id="Dependency_Microsoft_Extensions_Logging_Abstractions" Guid="{57455e07-02e9-40ca-b515-27dfa741b0cf}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
@@ -129,22 +121,6 @@
         <File Id="Dependency_Microsoft_Extensions_Primitives_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)Microsoft.Extensions.Primitives.dll" />
       </Component>
-      <Component Id="Dependency_Microsoft_Net_Http_Headers" Guid="{b738a754-dcb1-4288-a333-fdcff5866110}">
-        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
-          <RegistryValue KeyPath="yes"
-                         Name="Microsoft_Net_Http_Headers_Component" Type="integer" Value="1" />
-        </RegistryKey>
-        <File Id="Dependency_Microsoft_Net_Http_Headers_FILE"
-              Source="$(var.Mastersign.AutoForm.TargetDir)Microsoft.Net.Http.Headers.dll" />
-      </Component>
-      <Component Id="Dependency_Newtonsoft_Json" Guid="{4aff58cc-8a59-49f0-a8a0-5f6df3b338fa}">
-        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
-          <RegistryValue KeyPath="yes"
-                         Name="Newtonsoft_Json_Component" Type="integer" Value="1" />
-        </RegistryKey>
-        <File Id="Dependency_Newtonsoft_Json_FILE"
-              Source="$(var.Mastersign.AutoForm.TargetDir)Newtonsoft.Json.dll" />
-      </Component>
       <Component Id="Dependency_PuppeteerSharp" Guid="{fa15f845-35c1-4c6d-a9b1-b656289de7f7}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
           <RegistryValue KeyPath="yes"
@@ -176,6 +152,22 @@
         </RegistryKey>
         <File Id="Dependency_System_Buffers_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)System.Buffers.dll" />
+      </Component>
+      <Component Id="Dependency_System_Diagnostics_DiagnosticSource" Guid="{9df3e801-61df-47b2-825c-69d844c1c5a4}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
+          <RegistryValue KeyPath="yes"
+                         Name="System_Diagnostics_DiagnosticSource_Component" Type="integer" Value="1" />
+        </RegistryKey>
+        <File Id="Dependency_System_Diagnostics_DiagnosticSource_FILE"
+              Source="$(var.Mastersign.AutoForm.TargetDir)System.Diagnostics.DiagnosticSource.dll" />
+      </Component>
+      <Component Id="Dependency_System_IO_Packaging" Guid="{2bb034af-5344-4ed8-8343-9ad0b494e42b}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
+          <RegistryValue KeyPath="yes"
+                         Name="System_IO_Packaging_Component" Type="integer" Value="1" />
+        </RegistryKey>
+        <File Id="Dependency_System_IO_Packaging_FILE"
+              Source="$(var.Mastersign.AutoForm.TargetDir)System.IO.Packaging.dll" />
       </Component>
       <Component Id="Dependency_System_Memory" Guid="{0c16b159-486b-4eb5-8e14-f8b3dbc11fe3}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
@@ -209,6 +201,14 @@
         <File Id="Dependency_System_Text_Encodings_Web_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)System.Text.Encodings.Web.dll" />
       </Component>
+      <Component Id="Dependency_System_Text_Json" Guid="{74bfc105-f22c-458a-abb3-9ededc3c3434}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
+          <RegistryValue KeyPath="yes"
+                         Name="System_Text_Json_Component" Type="integer" Value="1" />
+        </RegistryKey>
+        <File Id="Dependency_System_Text_Json_FILE"
+              Source="$(var.Mastersign.AutoForm.TargetDir)System.Text.Json.dll" />
+      </Component>
       <Component Id="Dependency_System_Threading_Tasks_Extensions" Guid="{60f014f0-7e7d-47cc-a104-22ea1e64757c}">
         <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
           <RegistryValue KeyPath="yes"
@@ -216,6 +216,14 @@
         </RegistryKey>
         <File Id="Dependency_System_Threading_Tasks_Extensions_FILE"
               Source="$(var.Mastersign.AutoForm.TargetDir)System.Threading.Tasks.Extensions.dll" />
+      </Component>
+      <Component Id="Dependency_System_ValueTuple" Guid="{d25c2e9d-d930-4a21-9f21-1f19192b7eaf}">
+        <RegistryKey Root="HKCU" Key="Software\Mastersign\AutoForm\Dependencies">
+          <RegistryValue KeyPath="yes"
+                         Name="System_ValueTuple_Component" Type="integer" Value="1" />
+        </RegistryKey>
+        <File Id="Dependency_System_ValueTuple_FILE"
+              Source="$(var.Mastersign.AutoForm.TargetDir)System.ValueTuple.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
