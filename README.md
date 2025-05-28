@@ -24,6 +24,8 @@ Download and execute the MSI file from the [release](https://github.com/mastersi
 		- Change the description of the script `B5`
 		- Specify the size of the visible area in the browser (`B7` and `B8`)
 		- Describe the actions (row 12 and following)
+    - Use the strings `Begin Loop` and `End Loop` in column `A` to mark
+      the region to repeat for each data record
 	+ Put your data records in the _Records_ sheet, or delete the existing template rows there
 		- The first row must contain the column names
 		- Empty rows are ignored
@@ -64,7 +66,7 @@ _Interrupt the script execution and wait for the user to proceed._
 ### Delay
 _Wait the given milliseconds._
 
-* Parameter 1: Duration  
+* Parameter 1: Duration (_optional_, default: 1000)  
   The number of milliseconds to wait
 
 ### Navigate
@@ -72,7 +74,13 @@ _Navigate to the given URL. Cancel if timeout in milliseconds is reached._
 
 * Parameter 1: Url  
   The URL to navigate to
-* Parameter 2: Timeout (_optional_, default: 500)  
+* Parameter 2: Timeout (_optional_, default: 5000)  
+  The maximum number of milliseconds to wait for the page to load
+
+### Reload
+_Reload the current page. Cancel if timeout in milliseconds is reached._
+
+* Parameter 1: Timeout (_optional_, default: 5000)  
   The maximum number of milliseconds to wait for the page to load
 
 ### WaitFor
