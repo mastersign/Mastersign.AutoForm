@@ -306,6 +306,16 @@ namespace Mastersign.AutoForm
                 wb.Dispose();
                 wbs.Dispose();
             }
+
+            if (ap.PostActions.Count == 0 && ap.LoopActions.Count == 0 && ap.PreActions.Count > 0)
+            {
+                // if only pre-actions exist and therefore, no 'Begin Loop' directive is used
+                // move actions from PreActions to LoopActions
+                // to treat whole script as loop and allow variable substitution
+                ap.LoopActions.AddRange(ap.PreActions);
+                ap.PreActions.Clear();
+            }
+
             return ap;
         }
 
